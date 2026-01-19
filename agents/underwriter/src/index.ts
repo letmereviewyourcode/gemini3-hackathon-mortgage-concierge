@@ -7,9 +7,10 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GoogleAIFileManager } from '@google/generative-ai/server';
 import * as dotenv from 'dotenv';
 
-// Load environment variables
-const rootEnvPath = path.resolve(process.cwd(), '../.env');
-dotenv.config({ path: rootEnvPath });
+// Load environment variables (check multiple paths)
+dotenv.config({ path: path.join(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
 
 const app = express();
 const PORT = process.env.PORT || process.env.UNDERWRITER_PORT || 4001;
