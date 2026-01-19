@@ -1,0 +1,29 @@
+{
+    "name": "Property Vision Agent",
+    "version": "1.0.0",
+    "description": "Analyzes property video walkthroughs using Gemini 3 Flash.",
+    "author": "Gemini Hackathon Team",
+    "capabilities": [
+        {
+            "name": "AnalyzePropertyVideo",
+            "description": "Analyzes a video of a property to assess condition, style, and value additives.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "videoUrl": {
+                        "type": "string",
+                        "description": "URL of the video to analyze"
+                    },
+                    "propertyType": {
+                        "type": "string",
+                        "description": "Type of property (e.g., 'Single Family')"
+                    }
+                },
+                "required": [
+                    "videoUrl"
+                ]
+            }
+        }
+    ],
+    "url": "http://localhost:4023"
+}

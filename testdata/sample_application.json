@@ -1,0 +1,63 @@
+{
+    "name": "gemini-mortgage-concierge",
+    "sampleInput": {
+        "borrower": {
+            "name": "Alice Chen",
+            "income": 95000,
+            "monthlyDebts": 2500,
+            "creditScore": 720,
+            "propertyPrice": 350000
+        },
+        "property": {
+            "inputType": "demo",
+            "videoUrl": "https://www.youtube.com/watch?v=pQrS_qTv3M0",
+            "propertyType": "Single Family Home"
+        }
+    },
+    "expectedOutput": {
+        "decision": "Approved",
+        "riskLevel": "Low",
+        "dti": 31.6,
+        "conditionScore": 9,
+        "regulationCited": "B3-6-02"
+    },
+    "scenarios": [
+        {
+            "name": "Good Property - Should Approve",
+            "input": {
+                "income": 95000,
+                "monthlyDebts": 2500,
+                "creditScore": 720,
+                "propertyPrice": 350000,
+                "inputType": "demo",
+                "videoUrl": "pQrS_qTv3M0"
+            },
+            "expectedDecision": "Approved"
+        },
+        {
+            "name": "Bad Property - Should Deny",
+            "input": {
+                "income": 95000,
+                "monthlyDebts": 2500,
+                "creditScore": 720,
+                "propertyPrice": 350000,
+                "inputType": "demo",
+                "videoUrl": "xYj4_g75FKM"
+            },
+            "expectedDecision": "Denied"
+        },
+        {
+            "name": "High DTI - Should Deny/Refer",
+            "input": {
+                "income": 50000,
+                "monthlyDebts": 3500,
+                "creditScore": 720,
+                "propertyPrice": 350000,
+                "inputType": "demo",
+                "videoUrl": "pQrS_qTv3M0"
+            },
+            "expectedDecision": "Denied",
+            "reason": "DTI 84% exceeds 43% threshold"
+        }
+    ]
+}

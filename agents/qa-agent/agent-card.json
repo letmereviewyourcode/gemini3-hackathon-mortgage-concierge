@@ -1,0 +1,25 @@
+{
+    "name": "Quality Assurance Agent",
+    "version": "1.0.0",
+    "description": "Autonomous verification loop using Gemini 3 Thought Signatures.",
+    "author": "Gemini Hackathon Team",
+    "capabilities": [
+        {
+            "name": "VerifyDecision",
+            "description": "Critiques an underwriting decision for missing citations or logic gaps.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "decisionPack": {
+                        "type": "object",
+                        "description": "The full JSON decision output from the Underwriter."
+                    }
+                },
+                "required": [
+                    "decisionPack"
+                ]
+            }
+        }
+    ],
+    "url": "http://localhost:4024"
+}

@@ -1,0 +1,52 @@
+FANNIE MAE SELLING GUIDE - SIMULATED "REGULATION PACK" FOR GEMINI 3 HACKATHON
+VERSION: 2026.1
+--------------------------------------------------------------------------------
+
+CHAPTER B3-3: INCOME ASSESSMENT
+===============================
+
+REGULATION B3-3.1-01: General Income Information
+------------------------------------------------
+The lender must verify the borrower's employment for the most recent two years.
+- Variable income (bonuses, commissions, overtime) requires a 2-year history to be considered stable.
+- If less than 2 years but more than 1 year, may be used with strong compensating factors.
+- Gaps in employment > 1 month must be explained.
+
+REGULATION B3-3.1-08: Rental Income
+-----------------------------------
+- Rental income from the subject property (2-4 units) can be used to qualify.
+- Must use 75% of the gross lease amount to account for vacancy.
+- If the property is the borrower's primary residence, rental income from the main unit (boarder income) is generally NOT acceptable unless it is a generic ADU with separate independent access.
+
+REGULATION B3-6-02: Debt-to-Income Ratios
+-----------------------------------------
+- Maximum DTI is generally 45% for manually underwritten loans.
+- Exceptions up to 50% allowed with strong compensating factors (e.g., 12 months reserves, LTV < 60%).
+- Student loans: Use 1% of outstanding balance or the actual amortized payment, whichever is greater, if on IBR plan (unless $0).
+
+CHAPTER B4: PROPERTY APPRAISAL
+==============================
+
+REGULATION B4-1.3-05: Property Condition
+-----------------------------------------
+- The property must be safe, sound, and structurally secure.
+- "C5" and "C6" condition ratings are ineligible for delivery.
+- Significant deferred maintenance (e.g., leaky roof, foundation cracks) must be repaired prior to close.
+- Minor cosmetic issues (worn carpet, old paint) are acceptable (C4 condition).
+
+REGULATION B4-1.4-01: Appraisal Report
+--------------------------------------
+- Appraisals must be based on at least 3 comparable sales closed within 12 months.
+- Value adjustments must be bracketed.
+
+CHAPTER B5: SPECIAL PRODUCTS
+============================
+
+REGULATION B5-6-03: HomeReady Mortgage
+--------------------------------------
+- Max LTV 97%.
+- Borrower income must be <= 80% AMI (Area Median Income).
+- Reduced MI coverage allowed.
+
+--------------------------------------------------------------------------------
+(End of Regulation Pack)

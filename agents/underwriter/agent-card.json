@@ -1,0 +1,35 @@
+{
+    "name": "Underwriter Agent",
+    "description": "Analyzes financial data to assess mortgage risk and calculate debt-to-income limits.",
+    "url": "http://localhost:4001",
+    "version": "1.0.0",
+    "protocolVersion": "0.2.2",
+    "capabilities": {
+        "streaming": false,
+        "pushNotifications": false
+    },
+    "defaultInputModes": [
+        "application/json"
+    ],
+    "defaultOutputModes": [
+        "application/json"
+    ],
+    "skills": [
+        {
+            "id": "AnalyzeRisk",
+            "name": "AnalyzeRisk",
+            "description": "Calculates risk score and max loan amount based on income and debts.",
+            "tags": [
+                "mortgage",
+                "risk",
+                "underwriting"
+            ],
+            "inputModes": [
+                "application/json"
+            ],
+            "outputModes": [
+                "application/json"
+            ]
+        }
+    ]
+}
