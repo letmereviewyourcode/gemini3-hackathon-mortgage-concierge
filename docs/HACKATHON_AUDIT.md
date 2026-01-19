@@ -1,4 +1,4 @@
-# Hackathon Audit — Gemini Mortgage Concierge
+# Self Hackathon Audit — Gemini Mortgage Concierge
 
 > **Updated:** 2026-01-19 | **Repo:** gemini3-hackathon-mortgage-concierge
 
@@ -79,7 +79,3 @@ curl -X POST http://localhost:3100 \
 - TESTING.md — Test commands
 
 ---
-
-## Score Estimate: 93/100
-
-**Ready for submission.**
