@@ -36,7 +36,7 @@ graph TD
     D --> I
 ```
 
-**No Camunda/Zeebe required** — Pure Gemini 3 agents with local orchestration.
+**Pure Gemini 3 agents** with lightweight local orchestration.
 
 ---
 
