@@ -47,6 +47,7 @@ let publicUrl = `http://localhost:${PORT}`;
 
 // --- FILE API: UPLOAD REGULATION PACK ---
 let regulationFileUri: string | null = null;
+let regulationFileMetadata: any = null;
 
 async function uploadRegulations() {
     try {
@@ -56,6 +57,7 @@ async function uploadRegulations() {
             return;
         }
 
+        const fileStats = fs.statSync(filePath);
         console.log("📤 Uploading Regulation Pack to Gemini Files API...");
         const uploadResponse = await fileManager.uploadFile(filePath, {
             mimeType: "text/plain",
@@ -63,7 +65,14 @@ async function uploadRegulations() {
         });
 
         regulationFileUri = uploadResponse.file.uri;
-        console.log(`✅ Regulations Uploaded: ${regulationFileUri}`);
+        regulationFileMetadata = {
+            displayName: uploadResponse.file.displayName || 'Fannie Mae Regulation Pack',
+            mimeType: 'text/plain',
+            sizeBytes: fileStats.size,
+            fileUri: regulationFileUri,
+            uploadedAt: new Date().toISOString()
+        };
+        console.log(`✅ Regulations Uploaded: ${regulationFileUri} (${fileStats.size} bytes)`);
     } catch (e: any) {
         console.error("❌ Failed to upload regulations:", e.message);
     }
@@ -155,61 +164,83 @@ User Notes: ${textContent}`
                 console.warn("⚠️ No regulation file URI available. Using fallback.");
             }
 
+            const startTime = Date.now();
             const activeModel = await getModel();
+
+            // Count tokens for context proof
+            let tokenCount = 0;
+            try {
+                const countResult = await activeModel.countTokens(promptParts);
+                tokenCount = countResult.totalTokens;
+                console.log(`📊 [Context Proof] Prompt tokens: ${tokenCount}`);
+            } catch (e) {
+                console.log('📊 [Context Proof] Token counting unavailable');
+            }
+
             const result = await activeModel.generateContent(promptParts);
             const response = result.response;
             const initialReply = response.text();
+            const initialProcessingTime = Date.now() - startTime;
 
-            console.log('✅ [Underwriter] Initial Analysis complete. Starting QA Loop...');
+            console.log(`✅ [Underwriter] Initial Analysis complete in ${initialProcessingTime}ms. Starting QA Loop...`);
 
-            // --- AUTONOMOUS VERIFICATION LOOP ---
+            // --- AUTONOMOUS VERIFICATION LOOP WITH BOUNDED RETRY ---
+            const MAX_RETRIES = 2;
+            let retryCount = 0;
             let finalReply = initialReply;
+            let qaVerdict: any = { status: 'SKIPPED', feedback: null, thoughtSignature: null };
+
             try {
                 const cleanJson = initialReply.replace(/```json/g, '').replace(/```/g, '').trim();
-                const decisionParams = JSON.parse(cleanJson);
+                let decisionParams = JSON.parse(cleanJson);
 
-                // Call QA Agent via Proxy Port 4025 (routed to 4024) or direct 4024
-                const qaResponse = await axios.post('http://localhost:4024', {
-                    jsonrpc: '2.0',
-                    method: 'tasks/send',
-                    params: { data: { decisionPack: decisionParams } },
-                    id: Date.now()
-                });
+                while (retryCount < MAX_RETRIES) {
+                    console.log(`🔄 [QA Loop] Attempt ${retryCount + 1}/${MAX_RETRIES}`);
 
-                const qaResult = qaResponse.data.result?.artifacts?.[0]?.parts?.[0]?.text;
-                if (qaResult) {
-                    const qaJson = JSON.parse(qaResult.replace(/```json/g, '').replace(/```/g, '').trim());
-                    console.log(`🛡️ [QA Verification] Status: ${qaJson.status}`);
+                    const qaResponse = await axios.post(`http://localhost:${process.env.QA_PORT || 4024}`, {
+                        jsonrpc: '2.0',
+                        method: 'tasks/send',
+                        params: { data: { decisionPack: decisionParams } },
+                        id: Date.now()
+                    });
 
-                    if (qaJson.status === 'FAILED') {
-                        console.warn(`⚠️ [QA FAILED] Feedback: ${qaJson.feedback}. Triggering Auto-Fix...`);
+                    const qaResult = qaResponse.data.result?.artifacts?.[0]?.parts?.[0]?.text;
+                    if (qaResult) {
+                        const qaJson = JSON.parse(qaResult.replace(/```json/g, '').replace(/```/g, '').trim());
+                        qaVerdict = {
+                            status: qaJson.status,
+                            feedback: qaJson.feedback || null,
+                            thoughtSignature: qaJson.thoughtSignature || null,
+                            attempt: retryCount + 1
+                        };
+                        console.log(`🛡️ [QA Verification] Status: ${qaJson.status}`);
 
-                        const fixPrompt = `
-                         CRITICAL FEEDBACK FROM QA AUDIT:
-                         "${qaJson.feedback}"
-                         
-                         Existing Decision: ${initialReply}
-                         
-                         TASK: Fix the decision based on the feedback. Ensure citations are correct.
-                         Return CORRECTED JSON.
-                         `;
+                        if (qaJson.status === 'PASSED') {
+                            console.log('✅ [QA PASSED] Decision verified.');
+                            break;
+                        }
 
-                        // Re-prompt logic
-                        // Note: In 1.5/3.0 usually we continue chat, here we just do a new generation for simplicity but ideally we'd pass history.
-                        // For "Auto-Fix", a new prompt with context is fine.
+                        if (qaJson.status === 'FAILED' && retryCount < MAX_RETRIES - 1) {
+                            console.warn(`⚠️ [QA FAILED] Retry ${retryCount + 1}/${MAX_RETRIES}: ${qaJson.feedback}`);
 
-                        const fixParts = [...promptParts, { text: `\n\nPREVIOUS ATTEMPT:\n${initialReply}\n\nFIX REQUEST:\n${fixPrompt}` }];
-                        const activeModel = await getModel();
-                        const fixResult = await activeModel.generateContent(fixParts);
-                        finalReply = fixResult.response.text();
-                        console.log('✅ [Underwriter] Verified & Fixed Decision Generated.');
-                    } else {
-                        console.log('✅ [QA PASSED] Decision looks good.');
+                            const fixParts = [...promptParts, { text: `\n\nQA FEEDBACK (Retry ${retryCount + 1}):\n"${qaJson.feedback}"\n\nPREVIOUS ATTEMPT:\n${finalReply}\n\nTASK: Fix the decision and return corrected JSON.` }];
+                            const fixModel = await getModel();
+                            const fixResult = await fixModel.generateContent(fixParts);
+                            finalReply = fixResult.response.text();
+
+                            const fixedClean = finalReply.replace(/```json/g, '').replace(/```/g, '').trim();
+                            decisionParams = JSON.parse(fixedClean);
+                            console.log(`✅ [Auto-Fix] Retry ${retryCount + 1} generated.`);
+                        }
                     }
+                    retryCount++;
                 }
             } catch (qaError: any) {
                 console.error("⚠️ QA Loop Failed (skipping):", qaError.message);
+                qaVerdict = { status: 'ERROR', feedback: qaError.message };
             }
+
+            const totalProcessingTime = Date.now() - startTime;
 
             let resultPayload;
             if (method === 'message/send') {
@@ -221,10 +252,25 @@ User Notes: ${textContent}`
                     parts: [{ kind: 'text', text: finalReply }]
                 };
             } else {
+                // Parse final decision for enhanced response
+                let parsedDecision = {};
+                try {
+                    parsedDecision = JSON.parse(finalReply.replace(/```json/g, '').replace(/```/g, '').trim());
+                } catch { parsedDecision = { raw: finalReply }; }
+
                 resultPayload = {
                     id: id || Date.now().toString(),
                     status: { state: 'completed' },
-                    artifacts: [{ parts: [{ kind: 'text', text: finalReply }] }]
+                    artifacts: [{ parts: [{ kind: 'text', text: finalReply }] }],
+                    metadata: {
+                        processingTimeMs: totalProcessingTime,
+                        tokenCount: tokenCount,
+                        filesApiUsed: !!regulationFileUri,
+                        filesApiMetadata: regulationFileMetadata,
+                        qaVerdict: qaVerdict,
+                        model: TARGET_MODEL,
+                        retryCount: retryCount
+                    }
                 };
             }
 
