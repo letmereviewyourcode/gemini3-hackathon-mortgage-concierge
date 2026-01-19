@@ -10,7 +10,7 @@
 
 ---
 
-## Short Description (200 words)
+## Short Description 
 
 The **Gemini Mortgage Concierge** is a multi-agent AI system that revolutionizes mortgage pre-qualification by combining three flagship Gemini 3 capabilities: multimodal vision, the 1M token context window, and autonomous self-correction.
 
