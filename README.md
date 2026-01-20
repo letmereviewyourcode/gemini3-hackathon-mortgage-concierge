@@ -1,6 +1,6 @@
 # Gemini Mortgage Concierge 🏠
 
-> **Gemini 3 AI Developer Competition** | January 2026
+> **Gemini 3 AI Hackathon Competition** | February 2026
 
 **Audit-grade, proof-first mortgage pre-qualification using Gemini 3 multimodal + Files API + self-correcting QA.**
 
