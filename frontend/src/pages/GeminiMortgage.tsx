@@ -3,7 +3,19 @@ import { DemoShell } from '../layouts/DemoShell';
 import { Video, FileText, CheckCircle2, AlertTriangle, ShieldCheck, Play, Sparkles, Loader2, User, Eye, Scale, Shield, XCircle, Info, X, Zap, Brain, FileSearch, Upload, Link2, Image, Download, Camera, BookOpen } from 'lucide-react';
 import axios from 'axios';
 
-const PROXY_URL = '/gemini-proxy';
+// Use runtime configuration or fallback to env vars
+const getBrokerUrl = () => {
+    // @ts-ignore
+    if (window._env_ && window._env_.VITE_BROKER_URL) {
+        // @ts-ignore
+        return window._env_.VITE_BROKER_URL;
+    }
+    return import.meta.env.VITE_BROKER_URL || '';
+};
+
+const BROKER_BASE = getBrokerUrl();
+const PROXY_URL = BROKER_BASE ? BROKER_BASE : '/gemini-proxy';
+const IMAGE_PROXY = BROKER_BASE ? `${BROKER_BASE}/proxy-image` : '/image-proxy';
 
 // Multi-image Sample Scenarios (3 images each for comprehensive analysis)
 const SAMPLE_SCENARIOS = {
@@ -82,7 +94,15 @@ export const GeminiMortgage: React.FC = () => {
 
         try {
             for (const url of scenario.images) {
-                const proxyUrl = url.replace('https://images.unsplash.com', '/image-proxy');
+                // In production, we use the broker's proxy-image endpoint
+                // In dev, we use the vite proxy
+                let proxyUrl = '';
+                if (import.meta.env.VITE_BROKER_URL) {
+                    proxyUrl = `${IMAGE_PROXY}?url=${encodeURIComponent(url)}`;
+                } else {
+                    proxyUrl = url.replace('https://images.unsplash.com', '/image-proxy');
+                }
+
                 const response = await fetch(proxyUrl);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const blob = await response.blob();
@@ -102,6 +122,36 @@ export const GeminiMortgage: React.FC = () => {
         }
     };
 
+    // History State
+    const [history, setHistory] = useState<any[]>(() => {
+        try {
+            const saved = localStorage.getItem('gemini_mortgage_history');
+            return saved ? JSON.parse(saved) : [];
+        } catch { return []; }
+    });
+
+    // Security Gate State
+    const [demoCode, setDemoCode] = useState(() => sessionStorage.getItem('demoAccessCode') || '');
+    const [showAccessModal, setShowAccessModal] = useState(false);
+    const [tempCode, setTempCode] = useState('');
+
+    const verifyAndAnalyze = () => {
+        if (!demoCode) {
+            setShowAccessModal(true);
+            return;
+        }
+        handleAnalyze();
+    };
+
+    const saveCodeAndContinue = () => {
+        if (!tempCode.trim()) return;
+        sessionStorage.setItem('demoAccessCode', tempCode.trim());
+        setDemoCode(tempCode.trim());
+        setShowAccessModal(false);
+        // Small delay to let state update before triggering analysis
+        setTimeout(() => handleAnalyze(), 100);
+    };
+
     const handleAnalyze = async () => {
         setLoading(true); setCurrentStep(1); setResults({}); setErrorMessage('');
 
@@ -119,27 +169,72 @@ export const GeminiMortgage: React.FC = () => {
             requestData.images = uploadedImages;
         }
 
+        // Get Access Code
+        const activeCode = demoCode || sessionStorage.getItem('demoAccessCode') || '';
+        const headers = { 'X-DEMO-ACCESS-CODE': activeCode };
+
         try {
-            const visionRes = await axios.post(`${PROXY_URL}/property-vision/`, { jsonrpc: '2.0', method: 'tasks/send', params: { data: requestData }, id: 1 });
+            const visionRes = await axios.post(`${PROXY_URL}/property-vision/`,
+                { jsonrpc: '2.0', method: 'tasks/send', params: { data: requestData }, id: 1 },
+                { headers }
+            );
             const visionRaw = visionRes.data.result?.artifacts?.[0]?.parts?.[0]?.text;
             if (!visionRaw) throw new Error(visionRes.data.error?.message || "Property Vision returned no data.");
             const visionData = JSON.parse(visionRaw.replace(/```json/g, '').replace(/```/g, ''));
+
+            // Intermediate state update for UI progress
             setResults((p: any) => ({ ...p, vision: visionData, images: uploadedImages }));
             setCurrentStep(2);
 
-            const uwRes = await axios.post(`${PROXY_URL}/underwriter/`, { jsonrpc: '2.0', method: 'tasks/send', params: { data: { income: borrower.income, debts: borrower.monthlyDebts, creditScore: borrower.creditScore, propertyPrice: borrower.propertyPrice, propertyCondition: `Score ${visionData.conditionScore}/10. Defects: ${visionData.defects?.join(', ') || 'None'}`, message: { parts: [{ text: `Property: Score ${visionData.conditionScore}/10. Defects: ${visionData.defects?.join(', ') || 'None'}` }] } } }, id: 2 });
+            const uwRes = await axios.post(`${PROXY_URL}/underwriter/`,
+                { jsonrpc: '2.0', method: 'tasks/send', params: { data: { income: borrower.income, debts: borrower.monthlyDebts, creditScore: borrower.creditScore, propertyPrice: borrower.propertyPrice, propertyCondition: `Score ${visionData.conditionScore}/10. Defects: ${visionData.defects?.join(', ') || 'None'}`, message: { parts: [{ text: `Property: Score ${visionData.conditionScore}/10. Defects: ${visionData.defects?.join(', ') || 'None'}` }] } } }, id: 2 },
+                { headers }
+            );
             const uwRaw = uwRes.data.result?.artifacts?.[0]?.parts?.[0]?.text;
             if (!uwRaw) throw new Error("Underwriter returned no data.");
             const uwData = JSON.parse(uwRaw.replace(/```json/g, '').replace(/```/g, ''));
             if (uwData.dti && uwData.dti < 1) uwData.dti = uwData.dti * 100;
-            setResults((p: any) => ({ ...p, underwriter: uwData }));
+
+            const finalResults = { vision: visionData, underwriter: uwData, images: uploadedImages, borrower, timestamp: new Date().toISOString() };
+            setResults(finalResults);
+
+            // Save to History
+            const newHistory = [finalResults, ...history].slice(0, 10); // Keep last 10
+            setHistory(newHistory);
+            localStorage.setItem('gemini_mortgage_history', JSON.stringify(newHistory));
+
             setCurrentStep(3);
             await new Promise(r => setTimeout(r, 1200));
             setCurrentStep(4);
             setActiveTab('report');
         } catch (e: any) {
-            setCurrentStep(0); setErrorMessage(e.response?.data?.error?.message || e.message);
+            setCurrentStep(0);
+            if (e.response?.status === 403) {
+                setErrorMessage("⛔ Access Denied: Invalid Demo Code. Please check Devpost notes.");
+                sessionStorage.removeItem('demoAccessCode');
+                setDemoCode('');
+            } else if (e.response?.status === 429) {
+                setErrorMessage("⏳ Rate Limit Exceeded. Please wait a minute.");
+            } else {
+                setErrorMessage(e.response?.data?.error?.message || e.message);
+            }
         } finally { setLoading(false); }
+    };
+
+    const handleReset = () => {
+        setResults({});
+        setCurrentStep(0);
+        setErrorMessage('');
+        setActiveTab('input');
+        // Optional: Keep borrower data or reset? Keeping it is usually friendlier.
+    };
+
+    const loadFromHistory = (item: any) => {
+        setResults(item);
+        setBorrower(item.borrower);
+        setUploadedImages(item.images || []);
+        setCurrentStep(4);
+        setActiveTab('report');
     };
 
     // Generate professional HTML report for printing/PDF
@@ -318,7 +413,7 @@ export const GeminiMortgage: React.FC = () => {
     return (
         <DemoShell title="Gemini Mortgage Concierge">
             <div className="min-h-screen bg-zinc-950 text-white">
-                <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+                <div className="max-w-6xl mx-auto px-6 py-4 space-y-8">
 
                     <header className="text-center space-y-3">
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400 text-sm font-medium">
@@ -339,6 +434,9 @@ export const GeminiMortgage: React.FC = () => {
                         </button>
                         <button onClick={() => setActiveTab('report')} disabled={currentStep < 4} className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'report' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'} disabled:opacity-40`}>
                             <FileText size={16} className="inline mr-2 -mt-0.5" /> Report {currentStep >= 4 && <span className="ml-1 w-2 h-2 rounded-full bg-green-500 inline-block" />}
+                        </button>
+                        <button onClick={() => setActiveTab('history' as any)} className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'history' as any ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
+                            <BookOpen size={16} className="inline mr-2 -mt-0.5" /> History <span className="ml-1 px-1.5 py-0.5 bg-zinc-700 text-zinc-300 text-[10px] rounded-full">{history.length}</span>
                         </button>
                     </div>
 
@@ -437,7 +535,7 @@ export const GeminiMortgage: React.FC = () => {
                                     )}
                                 </div>
 
-                                <button onClick={handleAnalyze} disabled={loading} className="w-full flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-xl shadow-lg shadow-purple-500/20 transition-all disabled:opacity-50">
+                                <button onClick={verifyAndAnalyze} disabled={loading} className="w-full flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold bg-purple-600 hover:bg-purple-700 text-white rounded-xl shadow-lg shadow-purple-500/20 transition-all disabled:opacity-50">
                                     {loading ? <><Loader2 size={22} className="animate-spin" /> Analyzing...</> : <><Play size={22} fill="currentColor" /> Start Analysis</>}
                                 </button>
                             </div>
@@ -502,15 +600,69 @@ export const GeminiMortgage: React.FC = () => {
                         </div>
                     )}
 
+                    {/* HISTORY TAB */}
+                    {activeTab === 'history' as any && (
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-bold">Analysis History</h2>
+                            {history.length === 0 ? (
+                                <div className="p-10 text-center border border-dashed border-zinc-800 rounded-2xl">
+                                    <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-600"><FileSearch size={32} /></div>
+                                    <p className="text-zinc-500">No previous analyses found.</p>
+                                    <button onClick={() => setActiveTab('input')} className="mt-4 text-purple-400 hover:text-purple-300 text-sm font-medium">Start your first analysis</button>
+                                </div>
+                            ) : (
+                                <div className="grid gap-4">
+                                    {history.map((item, i) => {
+                                        const isApprovedH = item.underwriter?.decision?.toLowerCase().includes('approved');
+                                        return (
+                                            <div key={i} className="p-4 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-between hover:border-zinc-700 transition-colors">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isApprovedH ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                                                        {isApprovedH ? <CheckCircle2 size={24} /> : <XCircle size={24} />}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-bold text-white">{item.borrower.name}</div>
+                                                        <div className="text-xs text-zinc-500">{new Date(item.timestamp).toLocaleString()} • ${item.borrower.propertyPrice.toLocaleString()}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="text-right hidden sm:block">
+                                                        <div className={`font-bold ${isApprovedH ? 'text-green-400' : 'text-red-400'}`}>{isApprovedH ? 'APPROVED' : 'DENIED'}</div>
+                                                        <div className="text-xs text-zinc-500">Score: {item.vision?.conditionScore}/10</div>
+                                                    </div>
+                                                    <button onClick={() => loadFromHistory(item)} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm font-medium transition-colors">
+                                                        View Report
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                            {history.length > 0 && (
+                                <div className="text-center">
+                                    <button onClick={() => { localStorage.removeItem('gemini_mortgage_history'); setHistory([]); }} className="text-xs text-red-400 hover:text-red-300">
+                                        Clear History
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* ENHANCED REPORT TAB */}
                     {activeTab === 'report' && currentStep >= 4 && (
                         <div ref={reportRef} className="space-y-6">
-                            {/* Header with Download */}
-                            <div className="flex justify-between items-center">
-                                <h2 className="text-2xl font-bold">Pre-Qualification Report</h2>
-                                <button onClick={handleDownloadPDF} className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium">
-                                    <Download size={16} /> Download PDF
-                                </button>
+                            {/* Header with Actions */}
+                            <div className="flex justify-between items-center bg-zinc-900 p-4 rounded-xl border border-zinc-800">
+                                <h2 className="text-xl font-bold flex items-center gap-2"><Sparkles className="text-purple-400" size={20} /> Analysis Complete</h2>
+                                <div className="flex gap-2">
+                                    <button onClick={handleReset} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm font-medium transition-colors">
+                                        <Zap size={16} /> Start New
+                                    </button>
+                                    <button onClick={handleDownloadPDF} className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-purple-500/20">
+                                        <Download size={16} /> Download PDF
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Decision Banner */}
@@ -681,6 +833,48 @@ export const GeminiMortgage: React.FC = () => {
                             </div>
                         </div>
                         <button onClick={() => setShowExplainer(false)} className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl">Got It</button>
+                    </div>
+                </div>
+            )}
+
+            {/* ACCESS CODE MODAL */}
+            {showAccessModal && (
+                <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[60] p-6">
+                    <div className="bg-zinc-900 border border-purple-500/30 rounded-2xl max-w-md w-full p-8 space-y-6 shadow-2xl shadow-purple-900/20 relative overflow-hidden">
+                        {/* Decorative glow */}
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500" />
+
+                        <div className="text-center space-y-2">
+                            <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto text-purple-400 mb-2">
+                                <ShieldCheck size={32} />
+                            </div>
+                            <h2 className="text-2xl font-bold">Judge Access Required</h2>
+                            <p className="text-zinc-400 text-sm">To prevent API abuse during the public hackathon, this demo is gated.</p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Enter Demo Access Code</label>
+                                <input
+                                    type="text"
+                                    value={tempCode}
+                                    onChange={e => setTempCode(e.target.value)}
+                                    placeholder="Enter code from Devpost..."
+                                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition-colors text-center font-mono text-lg tracking-widest uppercase"
+                                    autoFocus
+                                />
+                            </div>
+
+                            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex gap-3 items-start">
+                                <Info size={16} className="text-blue-400 mt-0.5 shrink-0" />
+                                <p className="text-xs text-blue-200">Judges: You can find the access code in the <strong>"Judge's Notes"</strong> or <strong>"Additional Info"</strong> section of our Devpost submission.</p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button onClick={() => setShowAccessModal(false)} className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium rounded-xl transition-colors">Cancel</button>
+                            <button onClick={saveCodeAndContinue} disabled={!tempCode.trim()} className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Access Demo</button>
+                        </div>
                     </div>
                 </div>
             )}

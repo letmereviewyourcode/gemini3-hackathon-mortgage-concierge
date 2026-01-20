@@ -18,7 +18,7 @@ export const DemoShell: React.FC<DemoShellProps> = ({
     }, [title]);
 
     return (
-        <div className="flex flex-col h-screen bg-[var(--bg-primary)] overflow-hidden">
+        <div className="flex flex-col h-screen bg-[var(--bg-primary)] overflow-y-auto overflow-x-hidden">
             {/* Minimal Header for Demos - Can be overridden or used as is */}
             {/* Note: Specific demos like AiAgentChat might have their own Header bar (ChatHeader), 
                 so this Shell is primarily for layout structure and common meta-data. 

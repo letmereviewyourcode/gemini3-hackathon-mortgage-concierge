@@ -1,106 +1,57 @@
-# Judges Guide — Gemini Mortgage Concierge
+# 🧑‍⚖️ Judge's Guide: Gemini Mortgage Concierge
 
-> **One-Page Reference** | Gemini 3 AI Developer Competition
+Thank you for reviewing our submission! This guide ensures you see the best of **Gemini 3.0** in action.
 
----
+## 🚀 Live Demo Access
 
-## What This Project Does
+**URL**: [https://gemini-frontend-231423721146.us-central1.run.app](https://gemini-frontend-231423721146.us-central1.run.app)
 
-Automated mortgage pre-qualification that analyzes property photos and borrower financials to produce approve/deny decisions with regulation citations — in seconds instead of 30 days.
-
----
-
-## Gemini 3 Features (Code Evidence)
-
-### 1. Multimodal Vision ✅
-
-**File:** `agents/property-vision/src/index.ts:163`
-
-```typescript
-inlineData: { data: base64Data, mimeType }
-```
-
-Real image bytes sent to Gemini 3.0 Flash — not URLs or metadata.
+> **Note**: An **Access Code** is required to run analysis (gate protects our API quota).
+> Please find this code in the **"Judge's Notes"** or **"Additional Info"** field of our Devpost submission.
 
 ---
 
-### 2. Files API + 1M Context ✅
+## 🏎️ The "Happy Path" (60 Seconds)
 
-**File:** `agents/underwriter/src/index.ts:60-66, 152`
+Experience the full multi-agent swarm without typing a thing.
 
-```typescript
-// Upload regulation file at startup
-regulationFileUri = uploadResponse.file.uri;
+1.  **Enter Access Code**: When prompted/clicked on "Start Analysis".
+2.  **Select Scenario**: Click **"🏠 Modern Home"** (under "Quick load sample scenarios").
+    *   *Loads 3 high-res images of a pristine home.*
+3.  **Click "Start Analysis"**:
+    *   🚀 **Watch the Pipeline**: The UI updates in real-time as agents work.
 
-// Reference in prompt
-fileData: { mimeType: "text/plain", fileUri: regulationFileUri }
-```
+### ✅ Verification Checklist (What to look for)
 
-Regulation handbook loaded via Files API with actual file upload.
+| Feature | Where to see it | Proof it's Real |
+| :--- | :--- | :--- |
+| **Multimodal Vision** | **"Property Vision"** Card | See the Condition Score (e.g., 9/10) matching the images. |
+| **1M Context Window** | **"Files API"** Indicator | Look for `~85K tokens` used (Fannie Mae Guide loaded). |
+| **Regulation Citations** | **"Underwriter"** Card | Specific regulation (e.g., `B3-6-02`) cited in the decision. |
+| **Self-Correction** | **"QA Verification"** box | All checks pass (DTI, Credit, Hallucination). |
 
----
-
-### 3. Autonomous Self-Correction ✅
-
-**File:** `agents/underwriter/src/index.ts:172-212`
-
-```typescript
-if (qaJson.status === 'FAILED') {
-    // Auto-fix triggered (bounded retry)
-    const fixResult = await activeModel.generateContent(fixParts);
-}
-```
-
-QA Agent verifies decisions, triggers bounded retry (max 2 attempts).
+4.  **Finish**: Click **"Download PDF"** to see the generated professional report.
 
 ---
 
-## What Makes This NOT a Chat Wrapper
+## 🏚️ The "Edge Case" (Optional)
 
-| Feature | Evidence |
-|---------|----------|
-| **Multi-agent architecture** | 3 specialized agents with JSON-RPC contracts |
-| **Real multimodal** | Base64 `inlineData`, not URL descriptions |
-| **Real long context** | Files API `fileUri`, not RAG retrieval |
-| **Autonomous correction** | Self-fix without human approval |
-
----
-
-## Quick Verification Commands
-
-```bash
-# Check Gemini 3 model usage
-grep -r "gemini-3" agents/*/src/*.ts
-
-# Verify Files API
-grep -r "fileUri\|uploadFile" agents/underwriter/src/index.ts
-
-# Verify multimodal
-grep -r "inlineData" agents/property-vision/src/index.ts
-
-# Verify QA loop
-grep -rn "FAILED" agents/underwriter/src/index.ts
-```
+Want to see Gemini detect issues?
+1.  Click **"Start New Analysis"** (Top Right).
+2.  Click **"Input"** tab.
+3.  Select **"🏚️ Needs Work"** scenario.
+4.  Click **"Start Analysis"**.
+    *   **Result**: Vision Agent detects damage. Underwriter warns/denies based on "Property Condition" guidelines.
 
 ---
 
-## Demo Flow (2 minutes)
+## 🆘 Troubleshooting
 
-| Time | What to Show |
-|------|--------------|
-| 0:00 | Sample borrower data pre-filled |
-| 0:30 | Load 3 property images |
-| 1:00 | Files API badge during underwriting |
-| 1:30 | QA verification results |
-| 2:00 | Final decision with regulation citation |
+**"Rate Limit Exceeded"**?
+*   We have a strict cap (3 analyses/minute per IP) to allow fair access. Please wait 60 seconds and try again.
 
----
+**"Access Denied"**?
+*   Double-check the code from Devpost. It is case-sensitive.
 
-## Quick FAQ
-
-| Question | Answer |
-|----------|--------|
-| Is this a new project? | Yes, built for this hackathon |
-| Does it require external services? | Only Gemini API key |
-| Is multimodal real? | Yes, `inlineData` with base64 bytes |
-| Is Files API real? | Yes, `fileUri` from actual upload |
+**Demo Down?**
+*   Please watch our **3-minute walkthrough video** (linked in Devpost) which captures the exact same flow.

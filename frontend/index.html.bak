@@ -20,11 +20,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>Automation Playground</title>
-  <script>
-    window._env_ = {
-      VITE_BROKER_URL: "https://gemini-broker-231423721146.us-central1.run.app"
-    };
-  </script>
 </head>
 
 <body>

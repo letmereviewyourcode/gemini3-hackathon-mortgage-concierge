@@ -1,28 +1,30 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
-// https://vite.dev/config/
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   server: {
     port: 8100,
-    strictPort: true,
     proxy: {
+      // Proxy API requests to Broker
       '/gemini-proxy': {
-        target: 'http://localhost:4025',
+        target: 'http://localhost:4020',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/gemini-proxy/, ''),
       },
-      // Image proxy to bypass CORS for sample images from Unsplash
+      // Proxy Unsplash images to avoid CORS
       '/image-proxy': {
-        target: 'https://images.unsplash.com',
+        target: 'http://localhost:4020/proxy-image',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/image-proxy/, ''),
-        secure: true,
-      },
-    },
-  },
-  preview: {
-    port: 8100,
-  },
-})
+        rewrite: (path) => `?url=${encodeURIComponent(path.replace(/^\/image-proxy/, 'https://images.unsplash.com'))}`,
+      }
+    }
+  }
+});

@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.13.2",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.559.0",
     "marked": "^17.0.1",

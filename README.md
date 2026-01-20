@@ -2,11 +2,22 @@
 
 > **Gemini 3 AI Developer Competition** | January 2026
 
-Automated mortgage pre-qualification using **Gemini 3** multimodal vision, the **1M context window** via Files API, and an **autonomous self-correction loop**.
+**[Launch Live Demo 🚀](https://gemini-frontend-231423721146.us-central1.run.app)** | **[Watch 3-min Video 🎥](#)** | **[Devpost Submission](#)**
+
+> [!IMPORTANT]
+> **Judge Access Required**: To control API costs for Gemini 3.0 Pro/Flash, the live demo requires an access code.
+> **Judges**: The code is provided in the **"Judge's Notes"** or **"Additional Info"** section of our Devpost submission.
+>
+> **60-Second Test Drive**:
+> 1. Open [Live Demo](https://gemini-frontend-231423721146.us-central1.run.app)
+> 2. Enter Access Code (from Devpost)
+> 3. Click **"🏠 Modern Home"** then **"Start Analysis"**
+> 4. Watch Gemini 3.0 Flash & Pro automate the underwriting in seconds.
 
 ---
 
 ## ✨ Gemini 3 Features
+
 
 | Feature | Implementation | Model |
 |---------|----------------|-------|

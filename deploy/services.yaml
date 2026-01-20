@@ -1,0 +1,54 @@
+# Service Registry for Cloud Run Deployment
+# Project: gemini3-mortgage-concierge
+
+services:
+  broker:
+    name: gemini-broker
+    folder: broker
+    port: 8080
+    health: /health
+    env:
+      - VISION_URL
+      - UNDERWRITER_URL
+      - QA_URL
+    secrets:
+      - GEMINI_API_KEY
+    min_instances: 1
+
+  property-vision:
+    name: gemini-vision
+    folder: agents/property-vision
+    port: 8080
+    health: /.well-known/agent-card.json
+    secrets:
+      - GEMINI_API_KEY
+    min_instances: 0
+
+  underwriter:
+    name: gemini-underwriter
+    folder: agents/underwriter
+    port: 8080
+    health: /.well-known/agent-card.json
+    secrets:
+      - GEMINI_API_KEY
+    min_instances: 0
+    files:
+      - regulations.txt
+
+  qa-agent:
+    name: gemini-qa
+    folder: agents/qa-agent
+    port: 8080
+    health: /.well-known/agent-card.json
+    secrets:
+      - GEMINI_API_KEY
+    min_instances: 0
+
+  frontend:
+    name: gemini-frontend
+    folder: frontend
+    port: 8080
+    health: /
+    env:
+      - VITE_BROKER_URL
+    min_instances: 1

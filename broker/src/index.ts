@@ -10,7 +10,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env') });
 dotenv.config({ path: path.join(process.cwd(), '../.env') });
 
 const app = express();
-const PORT = process.env.BROKER_PORT || 4020;
+const PORT = process.env.PORT || process.env.BROKER_PORT || 4020;
 
 // Agent URLs from environment with defaults
 const VISION_URL = process.env.VISION_URL || `http://localhost:${process.env.VISION_PORT || 4023}`;
@@ -28,22 +28,117 @@ console.log(`   - Vision Agent: ${VISION_URL}`);
 console.log(`   - Underwriter Agent: ${UNDERWRITER_URL}`);
 console.log(`   - QA Agent: ${QA_URL}`);
 
+// Rate Limiting & Access Control
+interface RateLimit {
+    count: number;
+    lastReset: number;
+    analyses: number;
+}
+const rateLimits: Map<string, RateLimit> = new Map();
+const DAILY_LIMIT = 300; // Global daily limit (resets on restart/deploy for hackathon)
+let dailyAnalysisCount = 0;
+
+// Middleware: Verify Demo Access Code
+const validateDemoAccess = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // Skip for static assets/health if applied globally, but we'll apply per-route
+    const clientCode = req.headers['x-demo-access-code'] || req.query.code;
+    const serverCode = process.env.DEMO_ACCESS_TOKEN;
+
+    if (serverCode && clientCode !== serverCode) {
+        console.warn(`⛔ [Security] Invalid Access Code from ${req.ip}`);
+        return res.status(403).json({
+            error: "DEMO_CODE_REQUIRED",
+            message: "Demo access code required to run analysis. Check Devpost submission notes."
+        });
+    }
+    next();
+};
+
+// Middleware: Rate Limiter
+const rateLimiter = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const ip = req.ip || 'unknown';
+    const now = Date.now();
+
+    if (!rateLimits.has(ip)) {
+        rateLimits.set(ip, { count: 0, lastReset: now, analyses: 0 });
+    }
+
+    const limit = rateLimits.get(ip)!;
+
+    // Reset per minute
+    if (now - limit.lastReset > 60000) {
+        limit.count = 0;
+        limit.analyses = 0;
+        limit.lastReset = now;
+    }
+
+    limit.count++;
+
+    // Limits: 20 req/min general, 3 analyses/min hard cap
+    if (limit.count > 20) {
+        return res.status(429).json({ error: "RATE_LIMIT", message: "Too many requests. Please wait a minute." });
+    }
+
+    next();
+};
+
+// Middleware: Analysis Specific Limiter (Stricter)
+const analysisLimiter = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const ip = req.ip || 'unknown';
+    const limit = rateLimits.get(ip)!; // Guaranteed by rateLimiter running first
+
+    if (dailyAnalysisCount >= DAILY_LIMIT) {
+        return res.status(429).json({ error: "DAILY_QUOTA", message: "Global daily demo quota reached." });
+    }
+
+    if (limit.analyses >= 3) {
+        return res.status(429).json({ error: "RATE_LIMIT", message: "Max 3 analyses per minute. Please wait." });
+    }
+
+    limit.analyses++;
+    dailyAnalysisCount++;
+    next();
+};
+
 // Health check
 app.get('/health', (req, res) => {
     res.json({
         status: 'ok',
         mode: 'standalone',
-        version: '2.0.0-hackathon',
-        agents: {
-            vision: VISION_URL,
-            underwriter: UNDERWRITER_URL,
-            qa: QA_URL
+        version: '2.1.0-secure',
+        security: {
+            gateEnabled: !!process.env.DEMO_ACCESS_TOKEN,
+            dailyCount: dailyAnalysisCount
         }
     });
 });
 
+// Proxy: Property Vision
+app.post('/property-vision', validateDemoAccess, rateLimiter, analysisLimiter, async (req, res) => {
+    try {
+        console.log(`📸 Proxying to Vision Agent: ${VISION_URL}`);
+        const response = await axios.post(VISION_URL, req.body);
+        res.json(response.data);
+    } catch (err: any) {
+        console.error('Vision Proxy Error:', err.message);
+        res.status(500).json({ error: { message: err.message } });
+    }
+});
+
+// Proxy: Underwriter
+app.post('/underwriter', validateDemoAccess, rateLimiter, analysisLimiter, async (req, res) => {
+    try {
+        console.log(`📊 Proxying to Underwriter Agent: ${UNDERWRITER_URL}`);
+        const response = await axios.post(UNDERWRITER_URL, req.body);
+        res.json(response.data);
+    } catch (err: any) {
+        console.error('Underwriter Proxy Error:', err.message);
+        res.status(500).json({ error: { message: err.message } });
+    }
+});
+
 // Start Gemini Wizard Analysis
-app.post('/api/gemini-wizard', async (req, res) => {
+app.post('/api/gemini-wizard', validateDemoAccess, rateLimiter, analysisLimiter, async (req, res) => {
     const sessionId = uuidv4();
     const { borrower, property } = req.body;
 
@@ -212,18 +307,25 @@ function buildRecommendation(stepData: any, borrower: any): any {
     };
 }
 
-// CORS Proxy for images
+// CORS Proxy for images (Restricted to Unsplash)
 app.get('/proxy-image', async (req, res) => {
     const imageUrl = req.query.url as string;
     if (!imageUrl) {
         return res.status(400).send('Missing url');
     }
 
+    // Security: Only allow Unsplash
+    if (!imageUrl.startsWith('https://images.unsplash.com')) {
+        return res.status(403).send('Forbidden: Only Unsplash images allowed');
+    }
+
     try {
         const response = await axios.get(imageUrl, { responseType: 'arraybuffer', timeout: 10000 });
         res.set('Content-Type', response.headers['content-type']);
+        res.set('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
         res.send(response.data);
     } catch (err) {
+        console.error(`Proxy failed for ${imageUrl}:`, err);
         res.status(500).send('Failed to fetch image');
     }
 });

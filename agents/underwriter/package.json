@@ -1,7 +1,6 @@
 {
     "name": "agent-underwriter",
     "version": "1.0.0",
-    "type": "module",
     "description": "Mortgage Underwriter Agent (A2A Server)",
     "main": "dist/index.js",
     "scripts": {
