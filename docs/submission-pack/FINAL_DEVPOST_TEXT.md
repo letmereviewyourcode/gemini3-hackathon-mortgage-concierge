@@ -24,7 +24,8 @@ We built a **High-Agency Swarm** that automates the entire "Concept to Commitmen
 We have deployed a live, production-grade demo on Google Cloud Run.
 **Note**: To protect our API quota, the demo is gated. 
 
-**📢 Access Code**: `GeminiJudge2026`
+**📢 Demo Mode**: We've included **built-in scenarios** that run instantly without an access code.
+**📢 Access Code (Custom Input Only)**: `GeminiJudge2026`
 
 1.  **Launch Demo**: [https://gemini-frontend-231423721146.us-central1.run.app](https://gemini-frontend-231423721146.us-central1.run.app)
 2.  **Enter Access Code**: `GeminiJudge2026` (When prompted)

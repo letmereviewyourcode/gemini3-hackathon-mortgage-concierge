@@ -13,18 +13,23 @@
 
 > [!IMPORTANT]
 > **Yes, you can run this live!** 
-> To control API costs for Gemini 3.0 Pro/Flash, we have gated the analysis.
-> **Judges**: The required **Access Code** is available in the **"Judge's Notes"** or **"Additional Info"** section of our Devpost submission.
+> To control API costs, we have a **Demo Mode** with built-in scenarios (No Access Code required). Custom uploads are gated.
 >
-> **60-Second Test Drive**:
-> 1. Click **[Launch Live Demo](https://gemini-frontend-231423721146.us-central1.run.app)**.
+> **60-Second Test Drive (No Code Needed)**:
+> 1. Click **[Launch Live Demo 🚀](https://gemini-frontend-231423721146.us-central1.run.app/?demo=1)** (enables Demo Mode).
 > 2. Select **"🏠 Modern Home"** from the Quick Scenarios.
 > 3. Click the purple **"Start Analysis"** button.
-> 4. **WHEN PROMPTED**: Enter Code: `GeminiJudge2026`
+> 4. **That's it!** Watch Gemini 3.0 Flash & Pro automate the underwriting in seconds.
 >
-> ![Enter Access Code](docs/images/access-modal-guide.png)
->
-> 5. Watch Gemini 3.0 Flash & Pro automate the underwriting in seconds.
+> *Want to test custom images? Use code `GeminiJudge2026` (limited rate).*
+
+---
+
+## 🔗 Quick Links
+- **[Live Demo](https://gemini-frontend-231423721146.us-central1.run.app/?demo=1)** — Try it instantly
+- **[Judge's Guide](docs/JUDGES.md)** — One-page walkthrough
+- **[Devpost Submission](docs/submission-pack/FINAL_DEVPOST_TEXT.md)** — Full text
+- **[Testing Guide](docs/TESTING.md)** — E2E & Local setup
 
 ---
 
@@ -36,15 +41,16 @@ This is not just a chat wrapper. We use the full capabilities of the Gemini 3.0 
 
 ---
 
-## ✨ Features Sequence
+---
 
+## ✨ Proof-First Highlights (What to look for)
 
-| Feature | Implementation | Model |
-|---------|----------------|-------|
-| **Multimodal Vision** | Analyzes property image bytes via `inlineData` | Gemini 3.0 Flash |
-| **1M Context Window** | Loads 85K+ token regulation handbook via Files API | Gemini 3.0 Pro |
-| **Self-Correction** | QA Agent verifies decisions, triggers auto-fix on errors | Gemini 3.0 Pro |
+This isn't a black box. The UI is designed to **prove** the AI's work:
 
+- **Files API Context**: See the **"Files API"** badge in the pipeline showing ~85K tokens loaded (Fannie Mae Guide).
+- **Interactive Citations**: Click any regulation code (e.g., `B3-6-02`) in the report to open the **Citation Drawer** and read the exact excerpt the agent used.
+- **QA Verification**: Watch the **"QA Agent"** validate the math (e.g., DTI calculation) and check for hallucinations before approval.
+- **Visual Evidence**: The **Condition Score** (e.g., 8/10) directly correlates to defects seen in the images.
 ---
 
 ## 🏗️ Architecture

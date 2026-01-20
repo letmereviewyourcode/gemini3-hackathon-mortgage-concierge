@@ -259,14 +259,18 @@ curl -X POST http://localhost:4020/api/gemini-wizard \
 
 ## Frontend Test
 
-1. Open http://localhost:8100/projects/gemini-mortgage
-2. Click "🏠 Modern Home" → 3 images should load
-3. Click "Start Analysis"
-4. Verify:
+## Frontend Test
+
+1. Open http://localhost:5173/?demo=1 (or production URL)
+2. Click **"Demo"** Mode button (if not already active)
+3. Click "🏠 Modern Home" → 3 images should load
+4. Click "Start Analysis" (**No Access Code required**)
+5. Verify:
    - Processing pipeline shows 3 steps
-   - Files API indicator appears during Step 2
-   - Report tab shows APPROVED
+   - Files API indicator (85k tokens) appears
+   - Report tab shows APPROVED with DTI 31.6%
    - PDF download works
+
 
 ---
 
