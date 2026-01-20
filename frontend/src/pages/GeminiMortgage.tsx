@@ -498,8 +498,8 @@ export const GeminiMortgage: React.FC = () => {
 
     return (
         <DemoShell title="Gemini Mortgage Concierge">
-            <div className="min-h-screen bg-zinc-950 text-white">
-                <div className="max-w-6xl mx-auto px-6 py-6 space-y-6 pb-20">
+            <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
+                <div className="max-w-6xl mx-auto px-6 py-6 space-y-6 pb-20 flex-grow w-full">
 
                     <header className="text-center space-y-3 relative">
                         {/* Proof Mode Toggle - Top Right */}
