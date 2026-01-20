@@ -8,7 +8,7 @@
 
 ![Status](https://img.shields.io/badge/Status-Live%20%26%20Secured-success?style=for-the-badge) ![Gemini](https://img.shields.io/badge/AI-Gemini%203.0-8E75B2?style=for-the-badge)
 
-**Built by [Zishan Ali Khan](https://github.com/letmereviewyourcode)**
+**Built by [Zishan Ali Khan](https://www.linkedin.com/in/zishanalikhan/)** · [GitHub](https://github.com/letmereviewyourcode)
 
 
 > [!IMPORTANT]

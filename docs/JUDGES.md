@@ -106,8 +106,11 @@ cd ops && npx playwright test
 
 ## 👤 About the Builder
 
+<img src="images/zishan-ali-khan.png" alt="Zishan Ali Khan" width="120" style="border-radius: 50%; float: right; margin-left: 20px;" />
+
 **Zishan Ali Khan** — Builder / Architect
 
+- **LinkedIn**: [linkedin.com/in/zishanalikhan](https://www.linkedin.com/in/zishanalikhan/)
 - **GitHub**: [github.com/letmereviewyourcode](https://github.com/letmereviewyourcode)
 - **Project Repo**: [gemini3-hackathon-mortgage-concierge](https://github.com/letmereviewyourcode/gemini3-hackathon-mortgage-concierge)
 
