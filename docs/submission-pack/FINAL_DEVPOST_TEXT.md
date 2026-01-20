@@ -46,3 +46,7 @@ We have deployed a live, production-grade demo on Google Cloud Run.
 *   **Context Window Latency**: Loading 85k tokens took 40s initially. We optimized by caching the `fileUri` instad of re-uploading, cutting it to <5s.
 *   **Multimodal Hallucinations**: Vision models sometimes "invented" damage. We fixed this by adding the adversarial QA Agent that explicitly checks the Vision Agent's confidence scores.
 *   **Prompt Engineering JSON**: Getting Gemini to output strictly valid JSON for the frontend state machine required 40+ iterations of system instructions.
+
+# Data Sources & Licensing
+*   **Fannie Mae Selling Guide**: We use the publicly available [Fannie Mae Single Family Selling Guide](https://selling-guide.fanniemae.com/) to demonstrate the 1M+ token context capability. This content is used strictly for demonstration purposes.
+*   **Images**: All property photos used in the demo scenarios are sourced from **Unsplash** (Free for commercial use license).
