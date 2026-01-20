@@ -42,7 +42,13 @@ let dailyAnalysisCount = 0;
 const validateDemoAccess = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     // Skip for static assets/health if applied globally, but we'll apply per-route
     const clientCode = req.headers['x-demo-access-code'] || req.query.code;
+    const demoMode = req.headers['x-gemini-demo-mode'];
     const serverCode = process.env.DEMO_ACCESS_TOKEN;
+
+    // Allow built-in demo scenarios to bypass auth (for Hackathon judges)
+    if (demoMode === 'built-in') {
+        return next();
+    }
 
     if (serverCode && clientCode !== serverCode) {
         console.warn(`⛔ [Security] Invalid Access Code from ${req.ip}`);

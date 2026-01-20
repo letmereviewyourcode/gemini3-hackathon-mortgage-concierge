@@ -101,3 +101,14 @@ cd ops && npx playwright test
 ```
 
 **Deployment** uses Cloud Run revisions with traffic splitting for safe rollouts.
+
+---
+
+## 👤 About the Builder
+
+**Zishan Ali Khan** — Builder / Architect
+
+- **GitHub**: [github.com/letmereviewyourcode](https://github.com/letmereviewyourcode)
+- **Project Repo**: [gemini3-hackathon-mortgage-concierge](https://github.com/letmereviewyourcode/gemini3-hackathon-mortgage-concierge)
+
+*Focused on proof-first AI systems that provide auditable, regulation-compliant decisions.*

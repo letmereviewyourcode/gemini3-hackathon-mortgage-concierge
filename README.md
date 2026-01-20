@@ -2,9 +2,14 @@
 
 > **Gemini 3 AI Developer Competition** | January 2026
 
+**Audit-grade, proof-first mortgage pre-qualification using Gemini 3 multimodal + Files API + self-correcting QA.**
+
 **[Launch Live Demo 🚀](https://gemini-frontend-231423721146.us-central1.run.app)** | **[Watch 3-min Video 🎥](#)** | **[Read Submission Text 📄](docs/submission-pack/FINAL_DEVPOST_TEXT.md)**
 
 ![Status](https://img.shields.io/badge/Status-Live%20%26%20Secured-success?style=for-the-badge) ![Gemini](https://img.shields.io/badge/AI-Gemini%203.0-8E75B2?style=for-the-badge)
+
+**Built by [Zishan Ali Khan](https://github.com/letmereviewyourcode)**
+
 
 > [!IMPORTANT]
 > **Yes, you can run this live!** 
