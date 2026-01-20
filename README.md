@@ -15,7 +15,7 @@
 > 1. Click **[Launch Live Demo](https://gemini-frontend-231423721146.us-central1.run.app)**.
 > 2. Select **"🏠 Modern Home"** from the Quick Scenarios.
 > 3. Click the purple **"Start Analysis"** button.
-> 4. **WHEN PROMPTED**: Enter the Access Code (from Devpost).
+> 4. **WHEN PROMPTED**: Enter Code: `GeminiJudge2026`
 >
 > ![Enter Access Code](docs/images/access-modal-guide.png)
 >

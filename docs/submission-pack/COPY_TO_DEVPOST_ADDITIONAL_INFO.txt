@@ -1,0 +1,13 @@
+*** COPY BELOW THIS LINE ***
+
+**Testing Credentials / Access Code**:
+`GeminiJudge2026`
+
+**Step-by-Step Instructions**:
+1.  **Launch Demo**: https://gemini-frontend-231423721146.us-central1.run.app
+2.  **Select Scenario**: Click "🏠 Modern Home".
+3.  **Start Analysis**: Click the button.
+4.  **Authenticate**: Enter the code `GeminiJudge2026` when prompted.
+
+**Why is this gated?**
+This demo uses the *real* Gemini 3.0 Pro and Flash models (no mocks). We have gated it to prevent public API abuse during the voting period.

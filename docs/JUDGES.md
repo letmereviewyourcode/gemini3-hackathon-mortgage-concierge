@@ -8,8 +8,12 @@ Thank you for reviewing our submission! This guide ensures you see the best of *
 
 **Yes, you can run the full demo directly in your browser.** 
 
-> **Access Code Required**: To protect our Gemini API quota, you will be prompted for a code.
-> Please find this code in the **"Judge's Notes"** or **"Additional Info"** field of our Devpost submission.
+## 🔑 Access Control
+To protect our API quota while keeping the demo public, we use a simple Access Code.
+**Code**: `GeminiJudge2026`
+
+*   **Why?** Typically we would implement OAuth, but for the hackathon, a shared key allows instant access without account creation.
+*   **Rate Limits**: We enforce a **300 requests/day** cap. If you see a 429 error, please try again in 60 seconds (or DM us on Devpost).
 
 ---
 
