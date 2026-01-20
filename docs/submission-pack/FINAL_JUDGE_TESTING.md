@@ -4,7 +4,7 @@
 **Fastest way to verify.**
 
 1.  **Open URL**: [https://gemini-frontend-231423721146.us-central1.run.app](https://gemini-frontend-231423721146.us-central1.run.app)
-2.  **Authenticate**: Enter Code `GeminiJudge2026`.
+2.  **Authenticate**: Enter Code (See Devpost "Additional Info").
 3.  **Run Happy Path**:
     *   Select **"Input"** tab.
     *   Click **"🏠 Modern Home"**.
