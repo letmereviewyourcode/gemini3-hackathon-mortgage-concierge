@@ -166,5 +166,5 @@ gemini-mortgage-concierge/
 ## 📚 Documentation
 
 - [JUDGES.md](docs/JUDGES.md) — One-page judge guide
-- [TESTING.md](docs/TESTING.md) — Test commands
-- [DEVPOST_SUBMISSION.md](docs/DEVPOST_SUBMISSION.md) — Submission content
+- [TESTING.md](docs/submission-pack/FINAL_JUDGE_TESTING.md) — Testing guide
+- [DEVPOST_SUBMISSION.md](docs/submission-pack/FINAL_DEVPOST_TEXT.md) — Submission content   
