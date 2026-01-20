@@ -1,0 +1,15 @@
+{
+    "name": "gemini-mortgage-e2e",
+    "version": "1.0.0",
+    "description": "E2E tests for Gemini Mortgage Concierge",
+    "type": "module",
+    "scripts": {
+        "test:backend": "node e2e-backend.mjs",
+        "test:browser": "npx playwright test",
+        "test:all": "npm run test:backend && npm run test:browser"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.49.0",
+        "axios": "^1.7.0"
+    }
+}

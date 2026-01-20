@@ -1,0 +1,10 @@
+{
+  "scenario": "modern-home",
+  "name": "Modern Home (Expected: APPROVED)",
+  "url": "https://gemini-broker-231423721146.us-central1.run.app",
+  "timestamp": "2026-01-20T05:16:49.304Z",
+  "passed": false,
+  "assertions": [],
+  "response": null,
+  "error": "Request failed with status code 403"
+}

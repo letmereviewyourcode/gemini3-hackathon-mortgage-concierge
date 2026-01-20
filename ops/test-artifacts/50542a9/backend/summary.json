@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-01-20T05:16:52.347Z",
+  "baseUrl": "https://gemini-broker-231423721146.us-central1.run.app",
+  "gitSha": "50542a9",
+  "passed": 0,
+  "total": 1,
+  "results": [
+    {
+      "scenario": "modern-home",
+      "passed": false
+    }
+  ]
+}
