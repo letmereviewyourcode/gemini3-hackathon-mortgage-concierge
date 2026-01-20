@@ -69,3 +69,7 @@ graph TD
         I[regulations.txt<br>~85K tokens]
     end
     D --> I
+
+## Additional Docs
+For Judges: docs/JUDGES.md
+Testing Guide: docs/TESTING.md
