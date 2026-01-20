@@ -4,9 +4,11 @@ Thank you for reviewing our submission! This guide ensures you see the best of *
 
 ## 🚀 Live Demo Access
 
-**URL**: [https://gemini-frontend-231423721146.us-central1.run.app](https://gemini-frontend-231423721146.us-central1.run.app)
+**Launch URL**: [https://gemini-frontend-231423721146.us-central1.run.app](https://gemini-frontend-231423721146.us-central1.run.app)
 
-> **Note**: An **Access Code** is required to run analysis (gate protects our API quota).
+**Yes, you can run the full demo directly in your browser.** 
+
+> **Access Code Required**: To protect our Gemini API quota, you will be prompted for a code.
 > Please find this code in the **"Judge's Notes"** or **"Additional Info"** field of our Devpost submission.
 
 ---
