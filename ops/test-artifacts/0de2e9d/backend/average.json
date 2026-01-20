@@ -1,0 +1,125 @@
+{
+  "scenario": "average",
+  "name": "Average Home (Expected: CONDITIONAL/APPROVED)",
+  "url": "https://gemini-broker-231423721146.us-central1.run.app",
+  "timestamp": "2026-01-20T05:27:58.498Z",
+  "passed": true,
+  "assertions": [
+    {
+      "name": "decision_present",
+      "passed": true,
+      "value": "Refer",
+      "expected": "non-empty string"
+    },
+    {
+      "name": "dti_valid",
+      "passed": true,
+      "value": 31.58,
+      "expected": "0 < dti < 100"
+    },
+    {
+      "name": "property_score_valid",
+      "passed": true,
+      "value": 0,
+      "expected": "0-10 (0 = demo mode without images)"
+    },
+    {
+      "name": "citations_present",
+      "passed": true,
+      "value": "B3-6-02",
+      "expected": "regulation code pattern"
+    },
+    {
+      "name": "qa_verified",
+      "passed": true,
+      "value": true,
+      "expected": "qaVerified === true"
+    },
+    {
+      "name": "files_api_used",
+      "passed": true,
+      "value": true,
+      "expected": "filesApiUsed === true"
+    },
+    {
+      "name": "decision_matches_expected",
+      "passed": false,
+      "value": "Refer",
+      "expected": "approved|conditional"
+    }
+  ],
+  "response": {
+    "id": "f4751a64-7359-4ba4-9b9b-6378a258080b",
+    "status": "completed",
+    "progress": 100,
+    "currentStep": 3,
+    "stepData": {
+      "vision": {
+        "status": "completed",
+        "result": {
+          "raw": {
+            "jsonrpc": "2.0",
+            "error": {
+              "code": -32000,
+              "message": "No valid input provided. Use 'images', 'listing', or 'demo' mode."
+            },
+            "id": 1768886878536
+          }
+        }
+      },
+      "underwriter": {
+        "status": "completed",
+        "result": {
+          "riskLevel": "Medium",
+          "dti": 31.58,
+          "decision": "Refer",
+          "explanation": "DTI is 31.58%, which is below the maximum of 45% for manually underwritten loans (Regulation B3-6-02). However, the Property Condition is unavailable, which is crucial in determining risk. Therefore the loan is referred pending a valid property condition assessment.",
+          "regulationCited": "B3-6-02"
+        }
+      },
+      "qa": {
+        "status": "completed",
+        "result": {
+          "verified": true,
+          "checks": [
+            "dti",
+            "regulation",
+            "credit",
+            "property",
+            "hallucination"
+          ]
+        }
+      }
+    },
+    "borrower": {
+      "name": "Charlie Average",
+      "income": 95000,
+      "monthlyDebts": 2500,
+      "creditScore": 680,
+      "propertyPrice": 350000
+    },
+    "property": {
+      "images": [],
+      "type": "average"
+    },
+    "startedAt": "2026-01-20T05:27:58.535Z",
+    "completedAt": "2026-01-20T05:28:00.122Z",
+    "recommendation": {
+      "decision": "Refer",
+      "riskLevel": "Medium",
+      "dti": 31.58,
+      "conditionScore": 0,
+      "defects": [],
+      "explanation": "DTI is 31.58%, which is below the maximum of 45% for manually underwritten loans (Regulation B3-6-02). However, the Property Condition is unavailable, which is crucial in determining risk. Therefore the loan is referred pending a valid property condition assessment.",
+      "regulationCited": "B3-6-02",
+      "qaVerified": true,
+      "filesApiUsed": true,
+      "contextInfo": {
+        "documentLoaded": "Fannie Mae Selling Guide",
+        "mimeType": "text/plain",
+        "estimatedTokens": "~85,000"
+      }
+    }
+  },
+  "error": null
+}
