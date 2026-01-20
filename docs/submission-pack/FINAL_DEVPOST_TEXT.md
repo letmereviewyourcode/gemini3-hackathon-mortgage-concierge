@@ -24,10 +24,10 @@ We built a **High-Agency Swarm** that automates the entire "Concept to Commitmen
 We have deployed a live, production-grade demo on Google Cloud Run.
 **Note**: To protect our API quota, the demo is gated. 
 
-**📢 The Access Code is provided in the "Additional Info" field of this submission.**
+**📢 Access Code**: `GeminiJudge2026`
 
 1.  **Launch Demo**: [https://gemini-frontend-231423721146.us-central1.run.app](https://gemini-frontend-231423721146.us-central1.run.app)
-2.  **Enter Access Code**: (See "Additional Info" field below)
+2.  **Enter Access Code**: `GeminiJudge2026` (When prompted)
 3.  **Quick Run**: Click **"🏠 Modern Home"** -> **"Start Analysis"**.
 
 # Tech Stack
@@ -46,4 +46,3 @@ We have deployed a live, production-grade demo on Google Cloud Run.
 *   **Context Window Latency**: Loading 85k tokens took 40s initially. We optimized by caching the `fileUri` instad of re-uploading, cutting it to <5s.
 *   **Multimodal Hallucinations**: Vision models sometimes "invented" damage. We fixed this by adding the adversarial QA Agent that explicitly checks the Vision Agent's confidence scores.
 *   **Prompt Engineering JSON**: Getting Gemini to output strictly valid JSON for the frontend state machine required 40+ iterations of system instructions.
-
