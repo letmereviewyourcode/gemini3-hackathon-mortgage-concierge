@@ -2,7 +2,7 @@
 
 > **Gemini 3 AI Developer Competition** | January 2026
 
-**[Launch Live Demo 🚀](https://gemini-frontend-231423721146.us-central1.run.app)** | **[Watch 3-min Video 🎥](#)** | **[Devpost Submission](#)**
+**[Launch Live Demo 🚀](https://gemini-frontend-231423721146.us-central1.run.app)** | **[Watch 3-min Video 🎥](#)** | **[Devpost Submission (Link Pending)](#)**
 
 ![Status](https://img.shields.io/badge/Status-Live%20%26%20Secured-success?style=for-the-badge) ![Gemini](https://img.shields.io/badge/AI-Gemini%203.0-8E75B2?style=for-the-badge)
 
@@ -10,6 +10,16 @@
 > **Yes, you can run this live!** 
 > To control API costs for Gemini 3.0 Pro/Flash, we have gated the analysis.
 > **Judges**: The required **Access Code** is available in the **"Judge's Notes"** or **"Additional Info"** section of our Devpost submission.
+>
+> **60-Second Test Drive**:
+> 1. Click **[Launch Live Demo](https://gemini-frontend-231423721146.us-central1.run.app)**.
+> 2. Select **"🏠 Modern Home"** from the Quick Scenarios.
+> 3. Click the purple **"Start Analysis"** button.
+> 4. **WHEN PROMPTED**: Enter the Access Code (from Devpost).
+>
+> ![Enter Access Code](docs/images/access-modal-guide.png)
+>
+> 5. Watch Gemini 3.0 Flash & Pro automate the underwriting in seconds.
 
 ---
 
