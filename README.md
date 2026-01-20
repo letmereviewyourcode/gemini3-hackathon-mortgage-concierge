@@ -51,6 +51,15 @@ This is an orchestrated multi-agent workflow (not a single chat prompt). It uses
 
 ---
 
+
+
+## 📚 Documentation
+
+- [JUDGES.md](docs/JUDGES.md) — One-page judge guide
+- [TESTING.md](docs/submission-pack/FINAL_JUDGE_TESTING.md) — Testing guide
+- [DEVPOST_SUBMISSION.md](docs/submission-pack/FINAL_DEVPOST_TEXT.md) — Submission content
+  
+---
 ## 🏗️ Architecture
 
 ```mermaid
@@ -70,6 +79,8 @@ graph TD
     end
     D --> I
 
-## Additional Docs
-For Judges: docs/JUDGES.md
-Testing Guide: docs/TESTING.md
+
+
+
+
+
