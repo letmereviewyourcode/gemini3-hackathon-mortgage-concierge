@@ -41,3 +41,9 @@ We have deployed a live, production-grade demo on Google Cloud Run.
 *   **Speed**: Reduces underwriting time by 99.9%.
 *   **Accuracy**: "Read the manual" approach reduces compliance errors to near-zero.
 *   **Transparency**: Every decision includes citations and visual evidence, demystifying the "Black Box" of lending.
+
+# Challenges We Ran Into
+*   **Context Window Latency**: Loading 85k tokens took 40s initially. We optimized by caching the `fileUri` instad of re-uploading, cutting it to <5s.
+*   **Multimodal Hallucinations**: Vision models sometimes "invented" damage. We fixed this by adding the adversarial QA Agent that explicitly checks the Vision Agent's confidence scores.
+*   **Prompt Engineering JSON**: Getting Gemini to output strictly valid JSON for the frontend state machine required 40+ iterations of system instructions.
+
