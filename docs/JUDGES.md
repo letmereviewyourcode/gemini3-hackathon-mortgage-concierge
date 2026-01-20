@@ -61,3 +61,43 @@ Want to see Gemini detect issues?
 
 **Demo Down?**
 *   Please watch our **3-minute walkthrough video** (linked in Devpost) which captures the exact same flow.
+
+---
+
+## 🆕 New Features (v2.1.0)
+
+### Demo Mode (`?demo=1`)
+Add `?demo=1` to the URL to enable **Demo Mode**:
+- Built-in sample scenarios bypass access code
+- Demo Mode banner displayed
+- Perfect for quick demonstrations
+
+### Persona Toggle (Loan Officer / Borrower)
+Switch between views in the Report:
+- **Loan Officer View**: Full technical details, DTI breakdown, regulation citations, QA verification
+- **Borrower View**: Simplified friendly summary, approval status, next steps
+
+### Proof Mode Toggle
+Enable/disable detailed evidence display:
+- Token Meter showing Files API context window usage
+- Regulation citations with clickable details
+- QA verification checklist
+
+---
+
+## 🛠️ For Developers: E2E Testing
+
+We include automated E2E tests to verify the multi-agent pipeline.
+
+**Backend E2E Tests** (API-level):
+```bash
+cd ops && npm install
+GIT_SHA=$(git rev-parse --short HEAD) node e2e-backend.mjs https://gemini-broker-231423721146.us-central1.run.app
+```
+
+**Browser E2E Tests** (Playwright):
+```bash
+cd ops && npx playwright test
+```
+
+**Deployment** uses Cloud Run revisions with traffic splitting for safe rollouts.
