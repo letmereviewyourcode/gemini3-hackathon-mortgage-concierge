@@ -37,10 +37,10 @@
 
 ## 0:45 - 1:00 | The Gate (Hackathon Special)
 *   **Visual**: **Live App**.
-    *   **Action**: Click "Start Analysis". Modal appears.
-    *   **Action**: Type `GeminiJudge2026`.
-    *   **Overlay**: `overlay6_access_code.png` (shows "Enter access code: GeminiJudge2026").
-*   **Audio**: "We initiate the swarm. Note the secure access gate—protecting our production API quotas during the public judging period."
+    *   **Action**: Click "Start Analysis".
+    *   **Action**: *If Custom Input*: Type `GeminiJudge2026`. *If Demo Mode*: Instant access.
+    *   **Overlay**: `overlay6_access_code.png` (shows "Secure Gate / Demo Mode Bypass").
+*   **Audio**: "We initiate the swarm. For judges, our 'Demo Mode' provides instant access to built-in scenarios, while custom inputs are securely gated to protect production quotas."
 
 ## 1:00 - 1:15 | Vision Agent (Flash)
 *   **Visual**: **Live App** (Pipeline Running).
@@ -54,18 +54,27 @@
     *   **Zoom**: "Files Loaded" Token Gauge.
     *   **Overlay**: `overlay8_files_api.png` (shows "1,200-page guide").
     *   **Zoom**: "Citation: B3-6-02".
-    *   **Action**: *Use `overlay8_files_api.png` again or a new citation overlay if available*.
-*   **Audio**: "Next, the Underwriter Agent. This is the power of Gemini 3.0 Pro. We load the entire 85,000-token Fannie Mae Selling Guide via the Files API. The model reads the actual regulations in real-time to validate the loan, citing specific codes like B3-6-02."
+    *   **Action**: Click Citation -> Drawer Opens (Proof).
+*   **Audio**: "Next, the Underwriter Agent. We load the entire 85,000-token Fannie Mae Selling Guide via the **Files API**. It reads regulations in real-time, citing specific codes like B3-6-02."
 
 ## 1:45 - 2:00 | QA & Safety
 *   **Visual**: **Live App** (QA Card).
     *   **Overlay**: `overlay9_qa.png` *[To be created]*.
-*   **Audio**: "To prevent hallucinations, a dedicated QA Agent behaves as an adversarial auditor. It challenges every decision against the source evidence, forcing a self-correction loop if any discrepancy is found."
+*   **Audio**: "To prevent hallucinations, a dedicated QA Agent acts as an adversarial auditor, challenging every decision against the source evidence and forcing self-correction."
 
-## 2:00 - 2:15 | The Output
+## 2:00 - 2:15 | The Audit Layer (Proof Mode & Personas)
+*   **Visual**: **Live App** (Report Layer).
+    *   **Action**: Toggle **"Proof Mode"** ON.
+        *   *Visual*: Token meter glows, citations highlight.
+    *   **Action**: Toggle **"Borrower"** vs **"Loan Officer"**.
+        *   *Visual*: Switch from friendly summary to technical compliance dashboard.
+    *   **Overlay**: `overlay10_personas.png` (shows "Borrower vs Compliance View").
+*   **Audio**: "Transparency is key. We toggle **Proof Mode** to reveal the raw context usage and citations. And with **Persona Switching**, we instantly adapt the report from a friendly borrower summary to a deep-dive compliance dashboard for loan officers."
+
+## 2:15 - 2:30 | The Output
 *   **Visual**: **Live App** (Success State).
     *   **Action**: Click "Download PDF".
-    *   **Overlay**: `overlay10_pdf.png` (shows "Download PDF - evidence & citations inside").
+    *   **Overlay**: `overlay11_pdf.png` (shows "Download PDF - evidence & citations inside").
     *   **Show**: PDF Document First Page.
 *   **Audio**: "The result is instant. A fully underwritten, audit-ready pre-qualification letter generated in seconds, complete with regulatory citations."
 
