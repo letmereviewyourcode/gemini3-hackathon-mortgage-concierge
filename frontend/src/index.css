@@ -2,12 +2,15 @@
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 1.6;
   font-weight: 400;
+  font-size: 15px;
+  /* Increased from 14px for video readability */
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: rgba(255, 255, 255, 0.9);
+  /* Slightly brighter for contrast */
+  background-color: #0f0f12;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -20,4 +23,50 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* UI Polish - Typography Scale */
+.text-display {
+  font-size: 2.25rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.text-headline {
+  font-size: 1.5rem;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.text-title {
+  font-size: 1.125rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.text-body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.text-caption {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* Proof-first emphasis */
+.proof-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Footer safe area */
+.safe-footer {
+  margin-top: auto;
+  padding: 1.5rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }

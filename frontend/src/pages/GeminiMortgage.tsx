@@ -499,7 +499,7 @@ export const GeminiMortgage: React.FC = () => {
     return (
         <DemoShell title="Gemini Mortgage Concierge">
             <div className="min-h-screen bg-zinc-950 text-white">
-                <div className="max-w-6xl mx-auto px-6 py-4 space-y-8">
+                <div className="max-w-6xl mx-auto px-6 py-6 space-y-6 pb-20">
 
                     <header className="text-center space-y-3 relative">
                         {/* Proof Mode Toggle - Top Right */}
@@ -515,8 +515,8 @@ export const GeminiMortgage: React.FC = () => {
                             <PersonaToggle role={persona} onToggle={setPersona} />
                         </div>
 
-                        <h1 className="text-4xl font-bold tracking-tight">Mortgage Pre-Qualification</h1>
-                        <p className="text-zinc-400 max-w-xl mx-auto text-sm">
+                        <h1 className="text-4xl md:text-5xl font-bold tracking-tight" data-testid="page-title">Mortgage Pre-Qualification</h1>
+                        <p className="text-zinc-400 max-w-xl mx-auto text-base">
                             Upload property images for <strong className="text-purple-400">real multimodal analysis</strong> by Gemini 3.0 Flash.
                         </p>
                         <button onClick={() => setShowExplainer(true)} className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm mt-2">
@@ -527,24 +527,24 @@ export const GeminiMortgage: React.FC = () => {
                     {/* Demo Mode Banner */}
                     {isDemoMode && (
                         <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-y border-purple-500/20 py-2">
-                            <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-xs">
-                                <div className="flex items-center gap-2 text-purple-200">
-                                    <Zap size={14} className="text-yellow-400" fill="currentColor" />
-                                    <span className="font-bold">DEMO MODE ENABLED</span> — Access Code bypassed for built-in scenarios (Modern Home, Needs Work). Custom uploads still require code.
+                            <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm" data-testid="demo-banner">
+                                <div className="flex items-center gap-3 text-purple-100">
+                                    <Zap size={16} className="text-yellow-400" fill="currentColor" />
+                                    <span><span className="font-bold text-white">DEMO MODE</span> — No access code for built-in scenarios</span>
                                 </div>
                                 <button onClick={() => window.location.href = window.location.pathname} className="text-zinc-500 hover:text-white">Exit Demo</button>
                             </div>
                         </div>
                     )}
 
-                    <div className="flex justify-center gap-2">
-                        <button onClick={() => setActiveTab('input')} className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'input' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
+                    <div className="flex justify-center gap-2" data-testid="tab-bar">
+                        <button onClick={() => setActiveTab('input')} data-testid="tab-input" className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'input' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
                             <User size={16} className="inline mr-2 -mt-0.5" /> Input
                         </button>
-                        <button onClick={() => setActiveTab('report')} disabled={currentStep < 4} className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'report' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'} disabled:opacity-40`}>
+                        <button onClick={() => setActiveTab('report')} disabled={currentStep < 4} data-testid="tab-report" className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'report' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'} disabled:opacity-40`}>
                             <FileText size={16} className="inline mr-2 -mt-0.5" /> Report {currentStep >= 4 && <span className="ml-1 w-2 h-2 rounded-full bg-green-500 inline-block" />}
                         </button>
-                        <button onClick={() => setActiveTab('history')} className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'history' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
+                        <button onClick={() => setActiveTab('history')} data-testid="tab-history" className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'history' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
                             <BookOpen size={16} className="inline mr-2 -mt-0.5" /> History <span className="ml-1 px-1.5 py-0.5 bg-zinc-700 text-zinc-300 text-[10px] rounded-full">{history.length}</span>
                         </button>
                     </div>
@@ -578,7 +578,7 @@ export const GeminiMortgage: React.FC = () => {
                                         <button onClick={() => setInputMode('listing')} className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${inputMode === 'listing' ? 'bg-purple-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
                                             <Link2 size={16} /> URL
                                         </button>
-                                        <button onClick={() => setInputMode('demo')} className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${inputMode === 'demo' ? 'bg-purple-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
+                                        <button onClick={() => setInputMode('demo')} data-testid="input-mode-demo" className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${inputMode === 'demo' ? 'bg-purple-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
                                             <Video size={16} /> Demo
                                         </button>
                                     </div>
@@ -675,11 +675,29 @@ export const GeminiMortgage: React.FC = () => {
                                     {STEPS.map(s => {
                                         const isActive = currentStep === s.id, isDone = currentStep > s.id;
                                         return (
-                                            <div key={s.id} className={`rounded-lg transition-all ${isDone ? 'bg-green-500/10' : isActive ? 'bg-purple-500/10' : 'bg-zinc-800/30'}`}>
-                                                <div className="flex items-center gap-3 p-2.5">
-                                                    <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isDone ? 'bg-green-500 text-white' : isActive ? 'bg-purple-500 text-white animate-pulse' : 'bg-zinc-700 text-zinc-500'}`}>{isDone ? <CheckCircle2 size={18} /> : <s.icon size={18} />}</div>
-                                                    <div className="flex-1"><div className={`font-medium text-sm ${isDone ? 'text-green-400' : isActive ? 'text-white' : 'text-zinc-500'}`}>{s.label}</div><div className="text-[10px] text-zinc-500">{s.desc}</div></div>
-                                                    {isActive && <Loader2 size={14} className="animate-spin text-purple-400" />}
+                                            <div key={s.id} className={`rounded-lg transition-all border ${isDone ? 'bg-green-500/10 border-green-500/20' : isActive ? 'bg-purple-500/10 border-purple-500/30' : 'bg-zinc-800/30 border-transparent'}`}>
+                                                <div className="flex items-center gap-3 p-3">
+                                                    <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center ${isDone ? 'bg-green-500 text-white' : isActive ? 'bg-purple-500 text-white animate-pulse' : 'bg-zinc-700 text-zinc-500'}`}>{isDone ? <CheckCircle2 size={20} /> : <s.icon size={20} />}</div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className={`font-medium text-sm ${isActive || isDone ? 'text-white' : 'text-zinc-500'}`}>{s.label}</div>
+                                                        <div className="text-xs text-zinc-500 truncate">{s.desc}</div>
+                                                        {/* Proof Indicators */}
+                                                        {s.context && (
+                                                            <div className="mt-1.5 flex flex-wrap gap-2">
+                                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] border border-blue-500/20">
+                                                                    <BookOpen size={10} /> {s.context.tokens}
+                                                                </span>
+                                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-700/50 text-zinc-400 text-[10px] border border-zinc-700">
+                                                                    <FileText size={10} /> {s.context.file}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        {s.id === 3 && isDone && (
+                                                            <div className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 text-[10px] border border-green-500/20">
+                                                                <ShieldCheck size={10} /> QA Verified
+                                                            </div>
+                                                        )}
+                                                    </div>{isActive && <Loader2 size={14} className="animate-spin text-purple-400" />}
                                                 </div>
                                                 {/* Files API Context Indicator */}
                                                 {s.context && (isActive || isDone) && (
@@ -857,16 +875,36 @@ export const GeminiMortgage: React.FC = () => {
                                         </div>
 
                                         {/* Underwriter Card - Enhanced */}
-                                        <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-4">
+                                        <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-6">
                                             <div className="flex items-center gap-2 text-blue-400"><BookOpen size={18} /><span className="font-semibold">Regulation Analysis</span></div>
                                             <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/30">
                                                 <div className="flex items-center gap-2 text-amber-500 text-sm font-medium mb-1"><AlertTriangle size={14} /> Cited Regulation</div>
                                                 <p className="text-white font-mono">{results.underwriter?.regulationCited}</p>
                                             </div>
-                                            <div className="space-y-2 text-sm">
-                                                <div className="flex justify-between p-2 bg-zinc-800/50 rounded"><span className="text-zinc-500">Credit Score</span><span className="font-medium">{borrower.creditScore} {borrower.creditScore >= 700 ? '✓' : borrower.creditScore >= 620 ? '~' : '✗'}</span></div>
-                                                <div className="flex justify-between p-2 bg-zinc-800/50 rounded"><span className="text-zinc-500">DTI Ratio</span><span className={`font-medium ${+displayDti > 43 ? 'text-red-400' : 'text-green-400'}`}>{displayDti}% {+displayDti <= 43 ? '✓' : '✗'}</span></div>
-                                                <div className="flex justify-between p-2 bg-zinc-800/50 rounded"><span className="text-zinc-500">LTV Estimate</span><span className="font-medium">~80% ✓</span></div>
+                                            <div className="space-y-3">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div className="p-4 bg-zinc-800/40 rounded-xl border border-zinc-700/50">
+                                                        <span className="text-zinc-500 text-xs uppercase tracking-wider font-semibold block mb-1">DTI Ratio</span>
+                                                        <span className={`text-4xl font-bold tracking-tight ${+displayDti > 43 ? 'text-red-400' : 'text-green-400'}`}>
+                                                            {displayDti}%
+                                                        </span>
+                                                        <div className="text-xs text-zinc-500 mt-1 flex items-center gap-1">
+                                                            {+displayDti <= 43 ? <CheckCircle2 size={12} className="text-green-500" /> : <XCircle size={12} className="text-red-500" />}
+                                                            Threshold: 43%
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-4 bg-zinc-800/40 rounded-xl border border-zinc-700/50">
+                                                        <span className="text-zinc-500 text-xs uppercase tracking-wider font-semibold block mb-1">Credit Score</span>
+                                                        <span className={`text-4xl font-bold tracking-tight ${borrower.creditScore >= 620 ? 'text-white' : 'text-red-400'}`}>
+                                                            {borrower.creditScore}
+                                                        </span>
+                                                        <div className="text-xs text-zinc-500 mt-1 flex items-center gap-1">
+                                                            {borrower.creditScore >= 620 ? <CheckCircle2 size={12} className="text-green-500" /> : <XCircle size={12} className="text-red-500" />}
+                                                            Min: 620
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between p-3 bg-zinc-800/30 rounded-lg border border-zinc-700/30"><span className="text-zinc-400 text-sm">LTV Estimate</span><span className="font-medium text-white">~80% <span className="text-green-400">✓</span></span></div>
                                             </div>
                                         </div>
                                     </>
@@ -984,10 +1022,10 @@ export const GeminiMortgage: React.FC = () => {
                 citation={selectedCitation}
             />
 
-            {/* Subtle Footer */}
-            <footer className="mt-12 py-4 border-t border-zinc-800/50 text-center">
-                <p className="text-xs text-zinc-600">
-                    Built by <span className="text-zinc-500">Zishan Ali Khan</span> — Gemini 3 Hackathon (Jan 2026)
+            {/* Footer - Safe Area */}
+            <footer className="safe-footer mt-16" data-testid="page-footer">
+                <p className="text-sm text-zinc-500">
+                    Built by <a href="https://www.linkedin.com/in/zishanalikhan/" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-purple-400 transition-colors">Zishan Ali Khan</a> — Gemini 3 Hackathon (Jan 2026)
                 </p>
             </footer>
         </DemoShell >

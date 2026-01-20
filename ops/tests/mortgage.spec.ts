@@ -44,22 +44,28 @@ test.describe('Gemini Mortgage Concierge E2E', () => {
             await page.goto('/?demo=1');
 
             // Wait for page to load
-            await expect(page.locator('text=Gemini Mortgage Concierge')).toBeVisible({ timeout: 10000 });
+            await expect(page.getByTestId('page-title')).toBeVisible({ timeout: 10000 });
 
             // Check for Demo Mode banner
-            const demoBanner = page.locator('text=Demo Mode Enabled');
+            const demoBanner = page.getByTestId('demo-banner');
             await expect(demoBanner).toBeVisible({ timeout: 5000 });
+            await expect(demoBanner).toContainText('DEMO MODE');
+
+            // Verify Footer exists and has author link
+            const footer = page.getByTestId('page-footer');
+            await expect(footer).toBeVisible();
+            await expect(footer).toContainText('Zishan Ali Khan');
 
             // === Step 1: Select Input Mode (Demo Videos) ===
             // Click on the demo videos tab
-            const demoTab = page.locator('button:has-text("Demo Videos"), [aria-label*="demo"], button:has-text("Demo")');
+            const demoTab = page.getByTestId('input-mode-demo');
             if (await demoTab.isVisible()) {
                 await demoTab.click();
             }
 
             // === Step 2: Select Scenario ===
-            // Look for scenario button or card
-            const scenarioSelector = page.locator(`button:has-text("${scenario.name}"), [data-scenario="${scenario.key}"], text=${scenario.key}`).first();
+            // Look for scenario button or card using specific matchers
+            const scenarioSelector = page.getByRole('button', { name: scenario.name }).or(page.locator(`[data-scenario="${scenario.key}"]`)).first();
             if (await scenarioSelector.isVisible()) {
                 await scenarioSelector.click();
                 await page.waitForTimeout(1000);
@@ -175,7 +181,7 @@ test.describe('Gemini Mortgage Concierge E2E', () => {
         await page.waitForLoadState('networkidle');
 
         // Look for persona toggle
-        const personaToggle = page.locator('text=/Borrower|Loan Officer/i, [data-testid="persona-toggle"]');
+        const personaToggle = page.getByTestId('persona-toggle').or(page.locator('text=/Borrower|Loan Officer/i'));
 
         if (await personaToggle.count() > 0) {
             // Check that toggle is present
