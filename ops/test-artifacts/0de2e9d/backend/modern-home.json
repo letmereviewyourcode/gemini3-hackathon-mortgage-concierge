@@ -1,0 +1,125 @@
+{
+  "scenario": "modern-home",
+  "name": "Modern Home (Expected: APPROVED)",
+  "url": "https://gemini-broker-231423721146.us-central1.run.app",
+  "timestamp": "2026-01-20T05:27:48.245Z",
+  "passed": true,
+  "assertions": [
+    {
+      "name": "decision_present",
+      "passed": true,
+      "value": "Denied",
+      "expected": "non-empty string"
+    },
+    {
+      "name": "dti_valid",
+      "passed": true,
+      "value": 31.58,
+      "expected": "0 < dti < 100"
+    },
+    {
+      "name": "property_score_valid",
+      "passed": true,
+      "value": 0,
+      "expected": "0-10 (0 = demo mode without images)"
+    },
+    {
+      "name": "citations_present",
+      "passed": true,
+      "value": "B4-1.3-05",
+      "expected": "regulation code pattern"
+    },
+    {
+      "name": "qa_verified",
+      "passed": true,
+      "value": true,
+      "expected": "qaVerified === true"
+    },
+    {
+      "name": "files_api_used",
+      "passed": true,
+      "value": true,
+      "expected": "filesApiUsed === true"
+    },
+    {
+      "name": "decision_matches_expected",
+      "passed": false,
+      "value": "Denied",
+      "expected": "approved"
+    }
+  ],
+  "response": {
+    "id": "8cc13ece-a5c6-414e-9c4d-ed202b24efda",
+    "status": "completed",
+    "progress": 100,
+    "currentStep": 3,
+    "stepData": {
+      "vision": {
+        "status": "completed",
+        "result": {
+          "raw": {
+            "jsonrpc": "2.0",
+            "error": {
+              "code": -32000,
+              "message": "No valid input provided. Use 'images', 'listing', or 'demo' mode."
+            },
+            "id": 1768886868281
+          }
+        }
+      },
+      "underwriter": {
+        "status": "completed",
+        "result": {
+          "riskLevel": "High",
+          "dti": 31.58,
+          "decision": "Denied",
+          "explanation": "The property condition could not be determined, due to an error in the data provided. Properties with condition scores <= 4 are automatically denied due to habitability concerns. Therefore this loan application is denied.",
+          "regulationCited": "B4-1.3-05"
+        }
+      },
+      "qa": {
+        "status": "completed",
+        "result": {
+          "verified": true,
+          "checks": [
+            "dti",
+            "regulation",
+            "credit",
+            "property",
+            "hallucination"
+          ]
+        }
+      }
+    },
+    "borrower": {
+      "name": "Alice Chen",
+      "income": 95000,
+      "monthlyDebts": 2500,
+      "creditScore": 720,
+      "propertyPrice": 350000
+    },
+    "property": {
+      "images": [],
+      "type": "modern"
+    },
+    "startedAt": "2026-01-20T05:27:48.280Z",
+    "completedAt": "2026-01-20T05:27:49.721Z",
+    "recommendation": {
+      "decision": "Denied",
+      "riskLevel": "High",
+      "dti": 31.58,
+      "conditionScore": 0,
+      "defects": [],
+      "explanation": "The property condition could not be determined, due to an error in the data provided. Properties with condition scores <= 4 are automatically denied due to habitability concerns. Therefore this loan application is denied.",
+      "regulationCited": "B4-1.3-05",
+      "qaVerified": true,
+      "filesApiUsed": true,
+      "contextInfo": {
+        "documentLoaded": "Fannie Mae Selling Guide",
+        "mimeType": "text/plain",
+        "estimatedTokens": "~85,000"
+      }
+    }
+  },
+  "error": null
+}

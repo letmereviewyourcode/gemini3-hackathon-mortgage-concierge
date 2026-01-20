@@ -21,22 +21,22 @@ To protect our API quota while keeping the demo public, we use a simple Access C
 
 Experience the full multi-agent swarm without typing a thing.
 
-1.  **Enter Access Code**: When prompted/clicked on "Start Analysis".
-2.  **Select Scenario**: Click **"🏠 Modern Home"** (under "Quick load sample scenarios").
-    *   *Loads 3 high-res images of a pristine home.*
+1.  **Launch Demo**: **[Click Here](https://gemini-frontend-231423721146.us-central1.run.app/?demo=1)** (Enables Demo Mode).
+2.  **Select Scenario**: Click **"🏠 Modern Home"** card.
+    *   *Loads 3 high-res images of a pristine home for Gemini 3.0 Flash.*
 3.  **Click "Start Analysis"**:
-    *   🚀 **Watch the Pipeline**: The UI updates in real-time as agents work.
+    *   🚀 **Watch the Pipeline**: The UI updates in real-time as agents work. **No Access Code required.**
 
 ### ✅ Verification Checklist (What to look for)
 
 | Feature | Where to see it | Proof it's Real |
 | :--- | :--- | :--- |
-| **Multimodal Vision** | **"Property Vision"** Card | See the Condition Score (e.g., 9/10) matching the images. |
-| **1M Context Window** | **"Files API"** Indicator | Look for `~85K tokens` used (Fannie Mae Guide loaded). |
-| **Regulation Citations** | **"Underwriter"** Card | Specific regulation (e.g., `B3-6-02`) cited in the decision. |
-| **Self-Correction** | **"QA Verification"** box | All checks pass (DTI, Credit, Hallucination). |
+| **Multimodal Vision** | **"Property Vision"** Card | See the **Condition Score** (e.g., 8/10) derived from image bytes. |
+| **1M Context Window** | **Pipeline Badge** | Look for the **"Files API: ~85K tokens"** badge. |
+| **Interactive Proof** | **"Underwriter"** Card | **Click the regulation code** (e.g., `B3-6-02`) to see the exact text Gemini cited. |
+| **Self-Correction** | **"QA Verification"** Box | See **"Verified"** badges on DTI math and credit checks. |
 
-4.  **Finish**: Click **"Download PDF"** to see the generated professional report.
+4.  **Finish**: Click **"Download PDF"** to get the professional report with a unique Run ID.
 
 ---
 
@@ -61,3 +61,57 @@ Want to see Gemini detect issues?
 
 **Demo Down?**
 *   Please watch our **3-minute walkthrough video** (linked in Devpost) which captures the exact same flow.
+
+---
+
+## 🆕 New Features (v2.1.0)
+
+### Demo Mode (`?demo=1`)
+Add `?demo=1` to the URL to enable **Demo Mode**:
+- Built-in sample scenarios bypass access code
+- Demo Mode banner displayed
+- Perfect for quick demonstrations
+
+### Persona Toggle (Loan Officer / Borrower)
+Switch between views in the Report:
+- **Loan Officer View**: Full technical details, DTI breakdown, regulation citations, QA verification
+- **Borrower View**: Simplified friendly summary, approval status, next steps
+
+### Proof Mode Toggle
+Enable/disable detailed evidence display:
+- Token Meter showing Files API context window usage
+- Regulation citations with clickable details
+- QA verification checklist
+
+---
+
+## 🛠️ For Developers: E2E Testing
+
+We include automated E2E tests to verify the multi-agent pipeline.
+
+**Backend E2E Tests** (API-level):
+```bash
+cd ops && npm install
+GIT_SHA=$(git rev-parse --short HEAD) node e2e-backend.mjs https://gemini-broker-231423721146.us-central1.run.app
+```
+
+**Browser E2E Tests** (Playwright):
+```bash
+cd ops && npx playwright test
+```
+
+**Deployment** uses Cloud Run revisions with traffic splitting for safe rollouts.
+
+---
+
+## 👤 About the Builder
+
+<img src="images/zishan-ali-khan.png" alt="Zishan Ali Khan" width="120" style="border-radius: 50%; float: right; margin-left: 20px;" />
+
+**Zishan Ali Khan** — Builder / Architect
+
+- **LinkedIn**: [linkedin.com/in/zishanalikhan](https://www.linkedin.com/in/zishanalikhan/)
+- **GitHub**: [github.com/letmereviewyourcode](https://github.com/letmereviewyourcode)
+- **Project Repo**: [gemini3-hackathon-mortgage-concierge](https://github.com/letmereviewyourcode/gemini3-hackathon-mortgage-concierge)
+
+*Focused on proof-first AI systems that provide auditable, regulation-compliant decisions.*

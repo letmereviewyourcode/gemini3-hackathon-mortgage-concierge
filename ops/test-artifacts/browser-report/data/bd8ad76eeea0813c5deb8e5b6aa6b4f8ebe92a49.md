@@ -1,0 +1,192 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - banner [ref=e6]:
+      - 'button "PROOF MODE: OFF" [ref=e8]':
+        - img [ref=e9]
+        - text: "PROOF MODE: OFF"
+      - generic [ref=e14]:
+        - img [ref=e15]
+        - text: Gemini 3.0 Multi-Agent Swarm
+      - generic [ref=e19]:
+        - button "Borrower" [ref=e20]:
+          - img [ref=e21]
+          - text: Borrower
+        - button "Loan Officer" [ref=e24]:
+          - img [ref=e25]
+          - text: Loan Officer
+      - heading "Mortgage Pre-Qualification" [level=1] [ref=e28]
+      - paragraph [ref=e29]:
+        - text: Upload property images for
+        - strong [ref=e30]: real multimodal analysis
+        - text: by Gemini 3.0 Flash.
+      - button "How It Works" [ref=e31]:
+        - img [ref=e32]
+        - text: How It Works
+    - generic [ref=e35]:
+      - generic [ref=e36]:
+        - img [ref=e37]
+        - generic [ref=e39]: DEMO MODE — No access code for built-in scenarios
+      - button "Exit Demo" [ref=e40]
+    - generic [ref=e41]:
+      - button "Input" [ref=e42]:
+        - img [ref=e43]
+        - text: Input
+      - button "Report" [ref=e46]:
+        - img [ref=e47]
+        - text: Report
+      - button "History 1" [ref=e51]:
+        - img [ref=e52]
+        - text: History 1
+    - generic [ref=e54]:
+      - heading "Analysis Complete" [level=2] [ref=e56]:
+        - img [ref=e57]
+        - text: Analysis Complete
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - img [ref=e64]
+              - generic [ref=e67]: Property Vision
+            - generic [ref=e68]: 2/10
+          - paragraph [ref=e69]: This property is in extremely poor condition with significant deferred maintenance and potential structural issues. Extensive and costly renovations are required to make it habitable. Due to the severity of the defects, including water damage, mold, and foundation cracks, this property is not recommended without a thorough professional inspection and a significantly reduced purchase price reflecting the necessary repairs. The market value should be adjusted downwards by at least 40% to account for the required remediation and repairs. This property presents a HIGH RISK.
+          - generic [ref=e70]:
+            - generic [ref=e71]: "Issues Identified by AI:"
+            - generic [ref=e72]:
+              - generic [ref=e73]: ⚠️ Significant water stains on ceilings throughout
+              - generic [ref=e74]: ⚠️ Active moisture damage observed
+              - generic [ref=e75]: ⚠️ Visible black mold growth in bathroom
+              - generic [ref=e76]: ⚠️ Missing roof shingles, exposing underlayment
+              - generic [ref=e77]: ⚠️ Significant foundation cracks (potential structural issues)
+              - generic [ref=e78]: ⚠️ HVAC system non-functional or severely outdated
+              - generic [ref=e79]: ⚠️ Outdated electrical panel (potential safety hazard)
+              - generic [ref=e80]: ⚠️ Evidence of rodent infestation (droppings observed)
+              - generic [ref=e81]: ⚠️ Bathroom fixtures severely outdated and damaged
+        - generic [ref=e82]:
+          - generic [ref=e83]:
+            - img [ref=e84]
+            - generic [ref=e86]: Regulation Analysis
+          - generic [ref=e87]:
+            - generic [ref=e88]:
+              - img [ref=e89]
+              - text: Cited Regulation
+            - paragraph [ref=e91]: B4-1.3-05
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - generic [ref=e95]: DTI Ratio
+                - generic [ref=e96]: 31.6%
+                - generic [ref=e97]:
+                  - img [ref=e98]
+                  - text: "Threshold: 43%"
+              - generic [ref=e101]:
+                - generic [ref=e102]: Credit Score
+                - text: "720"
+                - generic [ref=e103]:
+                  - img [ref=e104]
+                  - text: "Min: 620"
+            - generic [ref=e107]:
+              - generic [ref=e108]: LTV Estimate
+              - generic [ref=e109]: ~80% ✓
+      - generic [ref=e110]:
+        - generic [ref=e111]:
+          - img [ref=e112]
+          - generic [ref=e115]: Quality Assurance Verification — All Checks Passed
+        - generic [ref=e116]:
+          - generic [ref=e117]:
+            - generic [ref=e118]: 31.6%
+            - generic [ref=e119]: DTI Verified
+          - generic [ref=e120]:
+            - generic [ref=e121]: B4-1.3-05
+            - generic [ref=e122]: Regulation
+          - generic [ref=e123]:
+            - generic [ref=e124]: 2/10
+            - generic [ref=e125]: Property Score
+          - generic [ref=e126]:
+            - generic [ref=e127]: Pass
+            - generic [ref=e128]: Credit Check
+          - generic [ref=e129]:
+            - generic [ref=e130]: None
+            - generic [ref=e131]: Hallucination
+  - generic [ref=e132]:
+    - generic [ref=e133]:
+      - generic [ref=e134]:
+        - img [ref=e135]
+        - heading "Demo Companion" [level=3] [ref=e138]
+      - button [ref=e139]:
+        - img [ref=e140]
+    - generic [ref=e144]:
+      - generic [ref=e145]:
+        - generic [ref=e146]: "1"
+        - heading "Start the Demo" [level=4] [ref=e148]
+      - generic [ref=e149]:
+        - generic [ref=e150]: "2"
+        - heading "Analysis in Progress" [level=4] [ref=e152]
+      - generic [ref=e153]:
+        - generic [ref=e154]: "3"
+        - generic [ref=e155]:
+          - heading "Review Results" [level=4] [ref=e156]
+          - generic [ref=e157]:
+            - paragraph [ref=e158]: Check the approved decision and cited regulations.
+            - paragraph [ref=e159]: 💡 Note the DTI calculation matches the formula.
+      - generic [ref=e160]:
+        - generic [ref=e161]: "4"
+        - generic [ref=e162]:
+          - heading "Verify & Export" [level=4] [ref=e163]
+          - generic [ref=e164]:
+            - paragraph [ref=e165]: Show the 'PDF Export' to demonstrate the final artifact.
+            - button "Scroll to PDF" [ref=e166]:
+              - img [ref=e167]
+              - text: Scroll to PDF
+  - generic [ref=e171]:
+    - generic [ref=e172]:
+      - generic [ref=e173]:
+        - img [ref=e175]
+        - generic [ref=e177]:
+          - heading "Instruction Guide" [level=3] [ref=e178]
+          - generic [ref=e179]: Fannie Mae Selling Guide (2024)
+      - button [ref=e180]:
+        - img [ref=e181]
+    - generic [ref=e184]:
+      - generic [ref=e185]:
+        - img [ref=e187]
+        - generic [ref=e190]:
+          - generic [ref=e191]: Verified Reference
+          - generic [ref=e192]: Regulation N/A
+      - generic [ref=e193]:
+        - generic [ref=e194]:
+          - img [ref=e195]
+          - generic [ref=e198]: Files API Retrieval
+        - generic [ref=e199]:
+          - generic [ref=e200]:
+            - generic [ref=e202]: Search Query
+            - generic [ref=e203]: find_regulation_text(code="")
+          - generic [ref=e204]:
+            - generic [ref=e206]:
+              - img [ref=e207]
+              - text: Match Found (Page 342)
+            - generic [ref=e212]:
+              - text: ...eligibility requirements... For borrowers with rental income, the lender must verify...
+              - strong [ref=e213]: If the property is a 2-4 unit principal residence
+              - text: ", rental income from the accessory unit..."
+              - generic [ref=e214]: (Guide Section )
+      - link "Open Full Guide" [ref=e216] [cursor=pointer]:
+        - /url: https://selling-guide.fanniemae.com/
+        - generic [ref=e217]:
+          - img [ref=e219]
+          - generic [ref=e223]: Open Full Guide
+        - img [ref=e224]
+      - generic [ref=e226]:
+        - img [ref=e227]
+        - generic [ref=e229]:
+          - strong [ref=e230]: "Trust Check:"
+          - text: This snippet is pulled directly from the loaded context window of Gemini 1.5 Pro. It matches the source PDF with 100% fidelity.
+  - contentinfo [ref=e231]:
+    - paragraph [ref=e232]:
+      - text: Built by
+      - link "Zishan Ali Khan" [ref=e233] [cursor=pointer]:
+        - /url: https://www.linkedin.com/in/zishanalikhan/
+      - text: — Gemini 3 Hackathon (Jan 2026)
+```

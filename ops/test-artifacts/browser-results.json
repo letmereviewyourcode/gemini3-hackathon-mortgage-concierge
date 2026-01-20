@@ -1,0 +1,361 @@
+{
+  "config": {
+    "configFile": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/playwright.config.ts",
+    "rootDir": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "test-artifacts/browser-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-artifacts/browser-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/test-artifacts/browser",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "mortgage.spec.ts",
+      "file": "mortgage.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Gemini Mortgage Concierge E2E",
+          "file": "mortgage.spec.ts",
+          "line": 34,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Scenario: Modern Home (Turnkey)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 120063,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/tests/mortgage.spec.ts",
+                            "column": 108,
+                            "line": 100
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('text=Analysis Complete, button:has-text(\"Report\"), text=Decision')\nExpected: visible\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 120000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=Analysis Complete, button:has-text(\"Report\"), text=Decision')\u001b[22m\n\n\n   98 |\n   99 |             // Wait for completion - look for Report tab or results\n> 100 |             await expect(page.locator('text=Analysis Complete, button:has-text(\"Report\"), text=Decision')).toBeVisible({\n      |                                                                                                            ^\n  101 |                 timeout: 120000 // 2 minutes for full pipeline\n  102 |             });\n  103 |\n    at /Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/tests/mortgage.spec.ts:100:108"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-20T06:01:36.187Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/test-artifacts/browser/mortgage-Gemini-Mortgage-C-2c5ef-enario-Modern-Home-Turnkey--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/test-artifacts/browser/mortgage-Gemini-Mortgage-C-2c5ef-enario-Modern-Home-Turnkey--chromium/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3c8d851cd4ccf61d3b47-1d00fd43f6aab18b8010",
+              "file": "mortgage.spec.ts",
+              "line": 42,
+              "column": 9
+            },
+            {
+              "title": "Scenario: Needs Work (Water Damage)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 120058,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/tests/mortgage.spec.ts",
+                            "column": 108,
+                            "line": 100
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('text=Analysis Complete, button:has-text(\"Report\"), text=Decision')\nExpected: visible\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 120000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=Analysis Complete, button:has-text(\"Report\"), text=Decision')\u001b[22m\n\n\n   98 |\n   99 |             // Wait for completion - look for Report tab or results\n> 100 |             await expect(page.locator('text=Analysis Complete, button:has-text(\"Report\"), text=Decision')).toBeVisible({\n      |                                                                                                            ^\n  101 |                 timeout: 120000 // 2 minutes for full pipeline\n  102 |             });\n  103 |\n    at /Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/tests/mortgage.spec.ts:100:108"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-20T06:03:37.044Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/test-artifacts/browser/mortgage-Gemini-Mortgage-C-8ed59-io-Needs-Work-Water-Damage--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/test-artifacts/browser/mortgage-Gemini-Mortgage-C-8ed59-io-Needs-Work-Water-Damage--chromium/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3c8d851cd4ccf61d3b47-5453b4f443aea46344f9",
+              "file": "mortgage.spec.ts",
+              "line": 42,
+              "column": 9
+            },
+            {
+              "title": "Scenario: Average Home (Mold)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 120062,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/tests/mortgage.spec.ts",
+                            "column": 108,
+                            "line": 100
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('text=Analysis Complete, button:has-text(\"Report\"), text=Decision')\nExpected: visible\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 120000ms\u001b[22m\n\u001b[2m  - waiting for locator('text=Analysis Complete, button:has-text(\"Report\"), text=Decision')\u001b[22m\n\n\n   98 |\n   99 |             // Wait for completion - look for Report tab or results\n> 100 |             await expect(page.locator('text=Analysis Complete, button:has-text(\"Report\"), text=Decision')).toBeVisible({\n      |                                                                                                            ^\n  101 |                 timeout: 120000 // 2 minutes for full pipeline\n  102 |             });\n  103 |\n    at /Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/tests/mortgage.spec.ts:100:108"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-20T06:05:37.860Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/test-artifacts/browser/mortgage-Gemini-Mortgage-C-1261f-Scenario-Average-Home-Mold--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/test-artifacts/browser/mortgage-Gemini-Mortgage-C-1261f-Scenario-Average-Home-Mold--chromium/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "3c8d851cd4ccf61d3b47-eec0f55f4537b4739df6",
+              "file": "mortgage.spec.ts",
+              "line": 42,
+              "column": 9
+            },
+            {
+              "title": "PDF Export triggers download",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1404,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "PDF Export test - checking button availability after analysis\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-20T06:07:38.627Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/test-artifacts/browser/mortgage-Gemini-Mortgage-C-deb14-DF-Export-triggers-download-chromium/test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3c8d851cd4ccf61d3b47-3d5e6435588b772285b0",
+              "file": "mortgage.spec.ts",
+              "line": 163,
+              "column": 5
+            },
+            {
+              "title": "Persona Toggle switches views",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1374,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Persona toggle is present and clickable\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-20T06:07:40.265Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/zishanali.khan/Documents/PoCs/Agentic Projects Zishan/Agentic Chatbots Portfolio/export/gemini-mortgage-concierge/ops/test-artifacts/browser/mortgage-Gemini-Mortgage-C-d9067-rsona-Toggle-switches-views-chromium/test-finished-1.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3c8d851cd4ccf61d3b47-140ac741fb812c27f94c",
+              "file": "mortgage.spec.ts",
+              "line": 179,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-20T06:01:35.841Z",
+    "duration": 365831.304,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}

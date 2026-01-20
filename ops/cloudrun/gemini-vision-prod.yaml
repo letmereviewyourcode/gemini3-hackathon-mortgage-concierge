@@ -1,0 +1,82 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations:
+    run.googleapis.com/client-name: gcloud
+    run.googleapis.com/client-version: 548.0.0
+    run.googleapis.com/ingress: all
+    run.googleapis.com/ingress-status: all
+    run.googleapis.com/maxScale: '20'
+    run.googleapis.com/operation-id: 9071c048-b74e-490f-bd4f-9112fdacf9e6
+    run.googleapis.com/urls: '["https://gemini-vision-231423721146.us-central1.run.app","https://gemini-vision-7t55rvhuja-uc.a.run.app"]'
+    serving.knative.dev/creator: zishanalik@gmail.com
+    serving.knative.dev/lastModifier: zishanalik@gmail.com
+  creationTimestamp: '2026-01-19T23:17:46.198958Z'
+  generation: 7
+  labels:
+    cloud.googleapis.com/location: us-central1
+  name: gemini-vision
+  namespace: '231423721146'
+  resourceVersion: AAZIxl7enps
+  selfLink: /apis/serving.knative.dev/v1/namespaces/231423721146/services/gemini-vision
+  uid: 7205353a-c8a8-40bf-b433-2dbffca005a7
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: '5'
+        run.googleapis.com/client-name: gcloud
+        run.googleapis.com/client-version: 548.0.0
+        run.googleapis.com/startup-cpu-boost: 'true'
+      labels:
+        client.knative.dev/nonce: qhkqlszvya
+        run.googleapis.com/startupProbeType: Default
+    spec:
+      containerConcurrency: 80
+      containers:
+      - env:
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: GEMINI_API_KEY
+        image: us-central1-docker.pkg.dev/gemini3-mortgage-concierge/gemini-mortgage/gemini-vision:latest
+        ports:
+        - containerPort: 8080
+          name: http1
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        startupProbe:
+          failureThreshold: 1
+          periodSeconds: 240
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 240
+      serviceAccountName: 231423721146-compute@developer.gserviceaccount.com
+      timeoutSeconds: 300
+  traffic:
+  - latestRevision: true
+    percent: 100
+status:
+  address:
+    url: https://gemini-vision-7t55rvhuja-uc.a.run.app
+  conditions:
+  - lastTransitionTime: '2026-01-19T23:51:32.636315Z'
+    status: 'True'
+    type: Ready
+  - lastTransitionTime: '2026-01-19T23:51:32.202693Z'
+    status: 'True'
+    type: ConfigurationsReady
+  - lastTransitionTime: '2026-01-19T23:51:32.605540Z'
+    status: 'True'
+    type: RoutesReady
+  latestCreatedRevisionName: gemini-vision-00007-j4x
+  latestReadyRevisionName: gemini-vision-00007-j4x
+  observedGeneration: 7
+  traffic:
+  - latestRevision: true
+    percent: 100
+    revisionName: gemini-vision-00007-j4x
+  url: https://gemini-vision-7t55rvhuja-uc.a.run.app

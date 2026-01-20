@@ -1,5 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { DemoShell } from '../layouts/DemoShell';
+import { DemoHelper } from '../components/DemoHelper';
+import { ProofModeToggle } from '../components/ProofModeToggle';
+import { TokenMeter } from '../components/TokenMeter';
+import { CitationDrawer } from '../components/CitationDrawer';
+import { PersonaToggle } from '../components/PersonaToggle';
 import { Video, FileText, CheckCircle2, AlertTriangle, ShieldCheck, Play, Sparkles, Loader2, User, Eye, Scale, Shield, XCircle, Info, X, Zap, Brain, FileSearch, Upload, Link2, Image, Download, Camera, BookOpen } from 'lucide-react';
 import axios from 'axios';
 
@@ -68,14 +73,62 @@ export const GeminiMortgage: React.FC = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [results, setResults] = useState<any>({});
     const [errorMessage, setErrorMessage] = useState('');
-    const [activeTab, setActiveTab] = useState<'input' | 'report'>('input');
+    const [activeTab, setActiveTab] = useState<'input' | 'report' | 'history'>('input');
     const [showExplainer, setShowExplainer] = useState(false);
+
+    // DEMO MODE Logic
+    const [isDemoMode, setIsDemoMode] = useState(false);
+    const [isSampleScenario, setIsSampleScenario] = useState(false); // Track if using built-in safe images
+
+    // PROOF MODE Logic
+    const [showProofMode, setShowProofMode] = useState(false);
+    const [selectedCitation, setSelectedCitation] = useState<string | null>(null);
+
+    // PERSONA Logic
+    const [persona, setPersona] = useState<'borrower' | 'officer'>('officer');
+
+    // Parse text and make citations clickable
+    const renderExplanationWithCitations = (text: string) => {
+        if (!text) return "Decision based on borrower financials and property condition.";
+
+        // Regex to find patterns like [B3-6-02], [Guide Section 123], (Regulation X)
+        // Adjust regex based on expected output format from Gemini
+        const citationRegex = /(\[[A-Z0-9-]{3,}\]|\(Guide Section [^)]+\))/g;
+
+        const parts = text.split(citationRegex);
+
+        return parts.map((part, i) => {
+            if (part.match(citationRegex)) {
+                const code = part.replace(/[\[\]()]/g, '').replace('Guide Section ', '');
+                return (
+                    <span
+                        key={i}
+                        onClick={() => setSelectedCitation(code)}
+                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-xs cursor-pointer hover:bg-blue-500/20 hover:text-blue-300 transition-colors border border-blue-500/30"
+                        title="Click to verify regulation in Files API"
+                    >
+                        <BookOpen size={10} />
+                        {code}
+                    </span>
+                );
+            }
+            return <span key={i}>{part}</span>;
+        });
+    };
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('demo') === '1' || params.get('demo') === 'true') {
+            setIsDemoMode(true);
+        }
+    }, []);
 
     const dti = borrower.income > 0 ? ((borrower.monthlyDebts * 12) / borrower.income * 100).toFixed(1) : '0.0';
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
+        setIsSampleScenario(false); // Custom upload -> not safe
         Array.from(files).slice(0, 5 - uploadedImages.length).forEach(file => {
             const reader = new FileReader();
             reader.onloadend = () => setUploadedImages(prev => [...prev, reader.result as string].slice(0, 5));
@@ -83,7 +136,10 @@ export const GeminiMortgage: React.FC = () => {
         });
     };
 
-    const removeImage = (index: number) => setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    const removeImage = (index: number) => {
+        setUploadedImages(prev => prev.filter((_, i) => i !== index));
+        setIsSampleScenario(false); // Manipulating it -> standard safety just in case
+    };
 
     // Load multiple images for a scenario
     const loadScenario = async (scenarioKey: keyof typeof SAMPLE_SCENARIOS) => {
@@ -114,6 +170,7 @@ export const GeminiMortgage: React.FC = () => {
                 loadedImages.push(base64);
             }
             setUploadedImages(loadedImages);
+            setIsSampleScenario(true); // Built-in sample -> safe
         } catch (e: any) {
             console.error('Scenario load failed:', e);
             setErrorMessage(`Failed to load scenario images. Please upload your own. (${e.message})`);
@@ -136,6 +193,12 @@ export const GeminiMortgage: React.FC = () => {
     const [tempCode, setTempCode] = useState('');
 
     const verifyAndAnalyze = () => {
+        // Bypass Access Code if in Demo Mode AND using built-in safe scenarios
+        if (isDemoMode && (isSampleScenario || inputMode === 'demo')) {
+            handleAnalyze();
+            return;
+        }
+
         if (!demoCode) {
             setShowAccessModal(true);
             return;
@@ -171,7 +234,15 @@ export const GeminiMortgage: React.FC = () => {
 
         // Get Access Code
         const activeCode = demoCode || sessionStorage.getItem('demoAccessCode') || '';
-        const headers = { 'X-DEMO-ACCESS-CODE': activeCode };
+
+        // Determine if we can bypass auth on backend
+        // We only allow bypass if Demo Mode is ON (Url param) AND we are using a built-in safe scenario.
+        const bypassAuth = isDemoMode && (isSampleScenario || inputMode === 'demo');
+
+        const headers: any = { 'X-DEMO-ACCESS-CODE': activeCode };
+        if (bypassAuth) {
+            headers['X-GEMINI-DEMO-MODE'] = 'built-in';
+        }
 
         try {
             const visionRes = await axios.post(`${PROXY_URL}/property-vision/`,
@@ -223,10 +294,20 @@ export const GeminiMortgage: React.FC = () => {
 
     const handleReset = () => {
         setResults({});
+        setHistory(prev => prev);
         setCurrentStep(0);
         setErrorMessage('');
         setActiveTab('input');
-        // Optional: Keep borrower data or reset? Keeping it is usually friendlier.
+        setUploadedImages([]);
+        setIsSampleScenario(false);
+    };
+
+    const handleDemoAction = (action: string) => {
+        if (action === 'good') {
+            loadScenario('good');
+        } else if (action === 'scroll_pdf') {
+            reportRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
     };
 
     const loadFromHistory = (item: any) => {
@@ -382,8 +463,9 @@ export const GeminiMortgage: React.FC = () => {
         </div>
         
         <div class="footer">
-            <p><strong>Gemini Mortgage Concierge</strong> — Powered by Gemini 3.0 Multi-Agent Architecture</p>
+            <p><strong>Gemini Mortgage Concierge</strong> — Built by Zishan Ali Khan</p>
             <p style="margin-top: 5px;">Property Vision (Flash) • Underwriter (Pro + Files API) • QA Agent (Pro)</p>
+            <p style="margin-top: 8px; font-size: 11px; color: #666;">Run ID: GMC-${Date.now().toString(36).toUpperCase()} • Generated: ${new Date().toISOString()}</p>
             <p style="margin-top: 10px; font-size: 10px;">This report is for pre-qualification purposes only and does not constitute a binding commitment to lend.</p>
         </div>
     </div>
@@ -410,17 +492,31 @@ export const GeminiMortgage: React.FC = () => {
     const isApproved = results.underwriter?.decision?.toLowerCase().includes('approved');
     const displayDti = results.underwriter?.dti?.toFixed?.(1) || dti;
 
+
+
+
+
     return (
         <DemoShell title="Gemini Mortgage Concierge">
             <div className="min-h-screen bg-zinc-950 text-white">
-                <div className="max-w-6xl mx-auto px-6 py-4 space-y-8">
+                <div className="max-w-6xl mx-auto px-6 py-6 space-y-6 pb-20">
 
-                    <header className="text-center space-y-3">
+                    <header className="text-center space-y-3 relative">
+                        {/* Proof Mode Toggle - Top Right */}
+                        <div className="absolute top-0 right-0 hidden md:block">
+                            <ProofModeToggle enabled={showProofMode} onToggle={setShowProofMode} />
+                        </div>
+
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400 text-sm font-medium">
                             <Sparkles size={14} /> Gemini 3.0 Multi-Agent Swarm
                         </div>
-                        <h1 className="text-4xl font-bold tracking-tight">Mortgage Pre-Qualification</h1>
-                        <p className="text-zinc-400 max-w-xl mx-auto text-sm">
+
+                        <div className="flex justify-center mt-2">
+                            <PersonaToggle role={persona} onToggle={setPersona} />
+                        </div>
+
+                        <h1 className="text-4xl md:text-5xl font-bold tracking-tight" data-testid="page-title">Mortgage Pre-Qualification</h1>
+                        <p className="text-zinc-400 max-w-xl mx-auto text-base">
                             Upload property images for <strong className="text-purple-400">real multimodal analysis</strong> by Gemini 3.0 Flash.
                         </p>
                         <button onClick={() => setShowExplainer(true)} className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm mt-2">
@@ -428,14 +524,27 @@ export const GeminiMortgage: React.FC = () => {
                         </button>
                     </header>
 
-                    <div className="flex justify-center gap-2">
-                        <button onClick={() => setActiveTab('input')} className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'input' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
+                    {/* Demo Mode Banner */}
+                    {isDemoMode && (
+                        <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-y border-purple-500/20 py-2">
+                            <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm" data-testid="demo-banner">
+                                <div className="flex items-center gap-3 text-purple-100">
+                                    <Zap size={16} className="text-yellow-400" fill="currentColor" />
+                                    <span><span className="font-bold text-white">DEMO MODE</span> — No access code for built-in scenarios</span>
+                                </div>
+                                <button onClick={() => window.location.href = window.location.pathname} className="text-zinc-500 hover:text-white">Exit Demo</button>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex justify-center gap-2" data-testid="tab-bar">
+                        <button onClick={() => setActiveTab('input')} data-testid="tab-input" className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'input' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
                             <User size={16} className="inline mr-2 -mt-0.5" /> Input
                         </button>
-                        <button onClick={() => setActiveTab('report')} disabled={currentStep < 4} className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'report' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'} disabled:opacity-40`}>
+                        <button onClick={() => setActiveTab('report')} disabled={currentStep < 4} data-testid="tab-report" className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'report' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'} disabled:opacity-40`}>
                             <FileText size={16} className="inline mr-2 -mt-0.5" /> Report {currentStep >= 4 && <span className="ml-1 w-2 h-2 rounded-full bg-green-500 inline-block" />}
                         </button>
-                        <button onClick={() => setActiveTab('history' as any)} className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'history' as any ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
+                        <button onClick={() => setActiveTab('history')} data-testid="tab-history" className={`px-6 py-2.5 rounded-full font-medium transition-all ${activeTab === 'history' ? 'bg-white text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
                             <BookOpen size={16} className="inline mr-2 -mt-0.5" /> History <span className="ml-1 px-1.5 py-0.5 bg-zinc-700 text-zinc-300 text-[10px] rounded-full">{history.length}</span>
                         </button>
                     </div>
@@ -469,7 +578,7 @@ export const GeminiMortgage: React.FC = () => {
                                         <button onClick={() => setInputMode('listing')} className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${inputMode === 'listing' ? 'bg-purple-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
                                             <Link2 size={16} /> URL
                                         </button>
-                                        <button onClick={() => setInputMode('demo')} className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${inputMode === 'demo' ? 'bg-purple-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
+                                        <button onClick={() => setInputMode('demo')} data-testid="input-mode-demo" className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${inputMode === 'demo' ? 'bg-purple-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
                                             <Video size={16} /> Demo
                                         </button>
                                     </div>
@@ -566,11 +675,29 @@ export const GeminiMortgage: React.FC = () => {
                                     {STEPS.map(s => {
                                         const isActive = currentStep === s.id, isDone = currentStep > s.id;
                                         return (
-                                            <div key={s.id} className={`rounded-lg transition-all ${isDone ? 'bg-green-500/10' : isActive ? 'bg-purple-500/10' : 'bg-zinc-800/30'}`}>
-                                                <div className="flex items-center gap-3 p-2.5">
-                                                    <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isDone ? 'bg-green-500 text-white' : isActive ? 'bg-purple-500 text-white animate-pulse' : 'bg-zinc-700 text-zinc-500'}`}>{isDone ? <CheckCircle2 size={18} /> : <s.icon size={18} />}</div>
-                                                    <div className="flex-1"><div className={`font-medium text-sm ${isDone ? 'text-green-400' : isActive ? 'text-white' : 'text-zinc-500'}`}>{s.label}</div><div className="text-[10px] text-zinc-500">{s.desc}</div></div>
-                                                    {isActive && <Loader2 size={14} className="animate-spin text-purple-400" />}
+                                            <div key={s.id} className={`rounded-lg transition-all border ${isDone ? 'bg-green-500/10 border-green-500/20' : isActive ? 'bg-purple-500/10 border-purple-500/30' : 'bg-zinc-800/30 border-transparent'}`}>
+                                                <div className="flex items-center gap-3 p-3">
+                                                    <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center ${isDone ? 'bg-green-500 text-white' : isActive ? 'bg-purple-500 text-white animate-pulse' : 'bg-zinc-700 text-zinc-500'}`}>{isDone ? <CheckCircle2 size={20} /> : <s.icon size={20} />}</div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className={`font-medium text-sm ${isActive || isDone ? 'text-white' : 'text-zinc-500'}`}>{s.label}</div>
+                                                        <div className="text-xs text-zinc-500 truncate">{s.desc}</div>
+                                                        {/* Proof Indicators */}
+                                                        {s.context && (
+                                                            <div className="mt-1.5 flex flex-wrap gap-2">
+                                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] border border-blue-500/20">
+                                                                    <BookOpen size={10} /> {s.context.tokens}
+                                                                </span>
+                                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-700/50 text-zinc-400 text-[10px] border border-zinc-700">
+                                                                    <FileText size={10} /> {s.context.file}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        {s.id === 3 && isDone && (
+                                                            <div className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 text-[10px] border border-green-500/20">
+                                                                <ShieldCheck size={10} /> QA Verified
+                                                            </div>
+                                                        )}
+                                                    </div>{isActive && <Loader2 size={14} className="animate-spin text-purple-400" />}
                                                 </div>
                                                 {/* Files API Context Indicator */}
                                                 {s.context && (isActive || isDone) && (
@@ -601,7 +728,7 @@ export const GeminiMortgage: React.FC = () => {
                     )}
 
                     {/* HISTORY TAB */}
-                    {activeTab === 'history' as any && (
+                    {activeTab === 'history' && (
                         <div className="space-y-6">
                             <h2 className="text-2xl font-bold">Analysis History</h2>
                             {history.length === 0 ? (
@@ -656,150 +783,154 @@ export const GeminiMortgage: React.FC = () => {
                             <div className="flex justify-between items-center bg-zinc-900 p-4 rounded-xl border border-zinc-800">
                                 <h2 className="text-xl font-bold flex items-center gap-2"><Sparkles className="text-purple-400" size={20} /> Analysis Complete</h2>
                                 <div className="flex gap-2">
-                                    <button onClick={handleReset} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm font-medium transition-colors">
-                                        <Zap size={16} /> Start New
-                                    </button>
-                                    <button onClick={handleDownloadPDF} className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-purple-500/20">
-                                        <Download size={16} /> Download PDF
-                                    </button>
                                 </div>
                             </div>
 
-                            {/* Decision Banner */}
-                            <div className={`p-6 rounded-2xl border flex flex-col md:flex-row items-center gap-6 ${isApproved ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
-                                <div className={`w-20 h-20 rounded-full flex items-center justify-center ${isApproved ? 'bg-green-500' : 'bg-red-500'}`}>
-                                    {isApproved ? <CheckCircle2 size={40} className="text-white" /> : <XCircle size={40} className="text-white" />}
-                                </div>
-                                <div className="flex-1 text-center md:text-left">
-                                    <div className={`text-4xl font-black ${isApproved ? 'text-green-400' : 'text-red-400'}`}>{results.underwriter?.decision?.toUpperCase() || (isApproved ? 'APPROVED' : 'DENIED')}</div>
-                                    <p className="text-sm text-zinc-400 mt-2 max-w-2xl">{results.underwriter?.explanation}</p>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 text-center">
-                                    <div className="p-3 bg-zinc-800/50 rounded-lg">
-                                        <div className="text-xs text-zinc-500">DTI</div>
-                                        <div className={`text-2xl font-bold ${+displayDti > 43 ? 'text-red-400' : 'text-green-400'}`}>{displayDti}%</div>
-                                    </div>
-                                    <div className="p-3 bg-zinc-800/50 rounded-lg">
-                                        <div className="text-xs text-zinc-500">Risk</div>
-                                        <div className={`text-2xl font-bold ${results.underwriter?.riskLevel === 'High' ? 'text-red-400' : results.underwriter?.riskLevel === 'Medium' ? 'text-yellow-400' : 'text-green-400'}`}>{results.underwriter?.riskLevel || 'Low'}</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div className="grid md:grid-cols-2 gap-5">
+                                {/* BORROWER VIEW - Simplified & Friendly */}
+                                {persona === 'borrower' && (
+                                    <div className="col-span-2 space-y-6">
+                                        <div className={`p-8 rounded-2xl text-center border ${isApproved ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+                                            <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${isApproved ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                                                {isApproved ? <CheckCircle2 size={40} /> : <XCircle size={40} />}
+                                            </div>
+                                            <h3 className={`text-3xl font-bold mb-2 ${isApproved ? 'text-green-400' : 'text-red-400'}`}>
+                                                {isApproved ? 'Pre-Qualification Approved' : 'Unable to Pre-Qualify'}
+                                            </h3>
+                                            <p className="text-zinc-300 max-w-2xl mx-auto text-lg mb-6">
+                                                {results.underwriter?.explanation?.split('[')[0] || 'We have reviewed your application and property details.'}
+                                            </p>
 
-                            {/* Property Images Evidence */}
-                            {results.images?.length > 0 && (
-                                <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-4">
-                                    <div className="flex items-center gap-2 text-purple-400"><Camera size={18} /><span className="font-semibold">Property Images Analyzed</span></div>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        {results.images.slice(0, 3).map((img: string, i: number) => (
-                                            <div key={i} className="relative rounded-lg overflow-hidden border border-zinc-700">
-                                                <img src={img} alt={`Property ${i + 1}`} className="w-full aspect-video object-cover" />
-                                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                                                    <span className="text-xs text-white">Image {i + 1}</span>
+                                            {isApproved && (
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
+                                                    <div className="p-4 bg-zinc-900/50 rounded-xl border border-zinc-700/50">
+                                                        <div className="text-zinc-400 text-xs uppercase tracking-wider mb-1">Loan Amount</div>
+                                                        <div className="text-xl font-bold text-white">${(borrower.propertyPrice * 0.8).toLocaleString()}</div>
+                                                    </div>
+                                                    <div className="p-4 bg-zinc-900/50 rounded-xl border border-zinc-700/50">
+                                                        <div className="text-zinc-400 text-xs uppercase tracking-wider mb-1">Interest Rate</div>
+                                                        <div className="text-xl font-bold text-white">6.5% <span className="text-xs font-normal text-zinc-500">(Est.)</span></div>
+                                                    </div>
+                                                    <div className="p-4 bg-zinc-900/50 rounded-xl border border-zinc-700/50">
+                                                        <div className="text-zinc-400 text-xs uppercase tracking-wider mb-1">Monthly Payment</div>
+                                                        <div className="text-xl font-bold text-white">${Math.round(borrower.propertyPrice * 0.8 * 0.00632).toLocaleString()}</div>
+                                                    </div>
                                                 </div>
+                                            )}
+                                        </div>
+
+                                        <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl">
+                                            <h4 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                                                <Sparkles size={18} className="text-purple-400" />
+                                                AI Property Insights
+                                            </h4>
+                                            <div className="flex gap-4 items-start">
+                                                <img src={results.images?.[0]} alt="Property" className="w-24 h-24 object-cover rounded-lg border border-zinc-700" />
+                                                <div>
+                                                    <p className="text-zinc-300 mb-2">{results.vision?.summary}</p>
+                                                    {results.vision?.conditionScore >= 7 ? (
+                                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-sm font-medium border border-green-500/20">
+                                                            <CheckCircle2 size={14} /> Property Looks Great
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-sm font-medium border border-yellow-500/20">
+                                                            <AlertTriangle size={14} /> Some Repairs Noted
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-center pt-4">
+                                            <button onClick={handleDownloadPDF} className="flex items-center gap-2 px-6 py-3 bg-white text-zinc-900 rounded-full font-bold hover:bg-zinc-200 transition-colors">
+                                                <Download size={18} /> Download Letter
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* LOAN OFFICER VIEW - Detailed Technical */}
+                                {persona === 'officer' && (
+                                    <>
+                                        {/* Property Vision Card - Enhanced */}
+                                        <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2 text-purple-400"><Eye size={18} /><span className="font-semibold">Property Vision</span></div>
+                                                <div className={`text-3xl font-black ${results.vision?.conditionScore <= 4 ? 'text-red-400' : results.vision?.conditionScore >= 8 ? 'text-green-400' : 'text-yellow-400'}`}>{results.vision?.conditionScore}/10</div>
+                                            </div>
+                                            <p className="text-sm text-zinc-400">{results.vision?.summary}</p>
+                                            {results.vision?.defects?.length > 0 && (
+                                                <div>
+                                                    <div className="text-xs text-zinc-500 mb-2">Issues Identified by AI:</div>
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {results.vision.defects.map((d: string, i: number) => (
+                                                            <span key={i} className="px-2 py-1 text-xs bg-red-500/20 text-red-400 rounded-md border border-red-500/30">⚠️ {d}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {(!results.vision?.defects || results.vision.defects.length === 0) && (
+                                                <div className="p-3 bg-green-500/10 rounded-lg text-green-400 text-sm">✓ No significant defects detected</div>
+                                            )}
+                                        </div>
+
+                                        {/* Underwriter Card - Enhanced */}
+                                        <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-6">
+                                            <div className="flex items-center gap-2 text-blue-400"><BookOpen size={18} /><span className="font-semibold">Regulation Analysis</span></div>
+                                            <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/30">
+                                                <div className="flex items-center gap-2 text-amber-500 text-sm font-medium mb-1"><AlertTriangle size={14} /> Cited Regulation</div>
+                                                <p className="text-white font-mono">{results.underwriter?.regulationCited}</p>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <div className="p-4 bg-zinc-800/40 rounded-xl border border-zinc-700/50">
+                                                        <span className="text-zinc-500 text-xs uppercase tracking-wider font-semibold block mb-1">DTI Ratio</span>
+                                                        <span className={`text-4xl font-bold tracking-tight ${+displayDti > 43 ? 'text-red-400' : 'text-green-400'}`}>
+                                                            {displayDti}%
+                                                        </span>
+                                                        <div className="text-xs text-zinc-500 mt-1 flex items-center gap-1">
+                                                            {+displayDti <= 43 ? <CheckCircle2 size={12} className="text-green-500" /> : <XCircle size={12} className="text-red-500" />}
+                                                            Threshold: 43%
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-4 bg-zinc-800/40 rounded-xl border border-zinc-700/50">
+                                                        <span className="text-zinc-500 text-xs uppercase tracking-wider font-semibold block mb-1">Credit Score</span>
+                                                        <span className={`text-4xl font-bold tracking-tight ${borrower.creditScore >= 620 ? 'text-white' : 'text-red-400'}`}>
+                                                            {borrower.creditScore}
+                                                        </span>
+                                                        <div className="text-xs text-zinc-500 mt-1 flex items-center gap-1">
+                                                            {borrower.creditScore >= 620 ? <CheckCircle2 size={12} className="text-green-500" /> : <XCircle size={12} className="text-red-500" />}
+                                                            Min: 620
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between p-3 bg-zinc-800/30 rounded-lg border border-zinc-700/30"><span className="text-zinc-400 text-sm">LTV Estimate</span><span className="font-medium text-white">~80% <span className="text-green-400">✓</span></span></div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* QA Verification - Officer Only */}
+                            {persona === 'officer' && (
+                                <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-2xl">
+                                    <div className="flex items-center gap-2 text-green-400 mb-4"><ShieldCheck size={18} /><span className="font-semibold">Quality Assurance Verification — All Checks Passed</span></div>
+                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                        {[
+                                            { label: 'DTI Verified', value: displayDti + '%' },
+                                            { label: 'Regulation', value: results.underwriter?.regulationCited?.split(' ')[0] || 'B3-6-02' },
+                                            { label: 'Property Score', value: results.vision?.conditionScore + '/10' },
+                                            { label: 'Credit Check', value: borrower.creditScore >= 620 ? 'Pass' : 'Fail' },
+                                            { label: 'Hallucination', value: 'None' },
+                                        ].map((check, i) => (
+                                            <div key={i} className="p-3 bg-green-500/10 rounded-lg text-center">
+                                                <div className="text-green-400 text-lg font-bold">{check.value}</div>
+                                                <div className="text-xs text-zinc-500">{check.label}</div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             )}
-
-                            {/* FILES API CONTEXT — Prominent display for judges */}
-                            <div className="p-5 bg-gradient-to-br from-blue-900/30 to-purple-900/30 border border-blue-500/40 rounded-2xl space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-blue-400">
-                                        <FileText size={20} />
-                                        <span className="font-bold text-lg">Files API — 1M Context Window</span>
-                                    </div>
-                                    <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-sm rounded-full border border-blue-500/30">Gemini 3.0 Pro</span>
-                                </div>
-                                <div className="grid md:grid-cols-3 gap-4">
-                                    <div className="p-3 bg-zinc-900/50 rounded-lg">
-                                        <div className="text-xs text-zinc-500 mb-1">Document Loaded</div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-2xl">📄</span>
-                                            <div>
-                                                <div className="text-white font-medium">Fannie Mae Selling Guide</div>
-                                                <div className="text-xs text-zinc-400">selling-guide-2024.pdf</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="p-3 bg-zinc-900/50 rounded-lg">
-                                        <div className="text-xs text-zinc-500 mb-1">Tokens Used</div>
-                                        <div className="text-3xl font-black text-blue-400">~85K</div>
-                                        <div className="text-xs text-zinc-400">of 1,000,000 available</div>
-                                    </div>
-                                    <div className="p-3 bg-zinc-900/50 rounded-lg">
-                                        <div className="text-xs text-zinc-500 mb-1">Context Usage</div>
-                                        <div className="h-3 bg-zinc-800 rounded-full overflow-hidden mt-2">
-                                            <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" style={{ width: '8.5%' }} />
-                                        </div>
-                                        <div className="flex justify-between mt-1 text-[10px] text-zinc-500">
-                                            <span>8.5% utilized</span>
-                                            <span>915K tokens remaining</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="text-xs text-zinc-400 bg-zinc-900/30 p-2 rounded-lg">
-                                    💡 <strong className="text-blue-300">Why this matters:</strong> The entire 500+ page Fannie Mae regulation handbook is loaded into Gemini's 1M token context window via the Files API, enabling precise regulation citations like <code className="bg-zinc-800 px-1 rounded">{results.underwriter?.regulationCited || 'B3-6-02'}</code> without hallucination.
-                                </div>
-                            </div>
-
-                            <div className="grid md:grid-cols-2 gap-5">
-                                {/* Property Vision Card - Enhanced */}
-                                <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-purple-400"><Eye size={18} /><span className="font-semibold">Property Vision</span></div>
-                                        <div className={`text-3xl font-black ${results.vision?.conditionScore <= 4 ? 'text-red-400' : results.vision?.conditionScore >= 8 ? 'text-green-400' : 'text-yellow-400'}`}>{results.vision?.conditionScore}/10</div>
-                                    </div>
-                                    <p className="text-sm text-zinc-400">{results.vision?.summary}</p>
-                                    {results.vision?.defects?.length > 0 && (
-                                        <div>
-                                            <div className="text-xs text-zinc-500 mb-2">Issues Identified by AI:</div>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {results.vision.defects.map((d: string, i: number) => (
-                                                    <span key={i} className="px-2 py-1 text-xs bg-red-500/20 text-red-400 rounded-md border border-red-500/30">⚠️ {d}</span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {(!results.vision?.defects || results.vision.defects.length === 0) && (
-                                        <div className="p-3 bg-green-500/10 rounded-lg text-green-400 text-sm">✓ No significant defects detected</div>
-                                    )}
-                                </div>
-
-                                {/* Underwriter Card - Enhanced */}
-                                <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-4">
-                                    <div className="flex items-center gap-2 text-blue-400"><BookOpen size={18} /><span className="font-semibold">Regulation Analysis</span></div>
-                                    <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/30">
-                                        <div className="flex items-center gap-2 text-amber-500 text-sm font-medium mb-1"><AlertTriangle size={14} /> Cited Regulation</div>
-                                        <p className="text-white font-mono">{results.underwriter?.regulationCited}</p>
-                                    </div>
-                                    <div className="space-y-2 text-sm">
-                                        <div className="flex justify-between p-2 bg-zinc-800/50 rounded"><span className="text-zinc-500">Credit Score</span><span className="font-medium">{borrower.creditScore} {borrower.creditScore >= 700 ? '✓' : borrower.creditScore >= 620 ? '~' : '✗'}</span></div>
-                                        <div className="flex justify-between p-2 bg-zinc-800/50 rounded"><span className="text-zinc-500">DTI Ratio</span><span className={`font-medium ${+displayDti > 43 ? 'text-red-400' : 'text-green-400'}`}>{displayDti}% {+displayDti <= 43 ? '✓' : '✗'}</span></div>
-                                        <div className="flex justify-between p-2 bg-zinc-800/50 rounded"><span className="text-zinc-500">LTV Estimate</span><span className="font-medium">~80% ✓</span></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* QA Verification */}
-                            <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-2xl">
-                                <div className="flex items-center gap-2 text-green-400 mb-4"><ShieldCheck size={18} /><span className="font-semibold">Quality Assurance Verification — All Checks Passed</span></div>
-                                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                                    {[
-                                        { label: 'DTI Verified', value: displayDti + '%' },
-                                        { label: 'Regulation', value: results.underwriter?.regulationCited?.split(' ')[0] || 'B3-6-02' },
-                                        { label: 'Property Score', value: results.vision?.conditionScore + '/10' },
-                                        { label: 'Credit Check', value: borrower.creditScore >= 620 ? 'Pass' : 'Fail' },
-                                        { label: 'Hallucination', value: 'None' },
-                                    ].map((check, i) => (
-                                        <div key={i} className="p-3 bg-green-500/10 rounded-lg text-center">
-                                            <div className="text-green-400 text-lg font-bold">{check.value}</div>
-                                            <div className="text-xs text-zinc-500">{check.label}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
                         </div>
                     )}
 
@@ -807,77 +938,97 @@ export const GeminiMortgage: React.FC = () => {
                 </div>
             </div>
 
-            {showExplainer && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-                    <div className="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-auto p-6 space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold">How It Works</h2>
-                            <button onClick={() => setShowExplainer(false)} className="text-zinc-400 hover:text-white"><X size={24} /></button>
-                        </div>
-                        <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
-                            <div className="flex items-center gap-2 text-green-400 font-semibold mb-2"><Zap size={16} /> Real Multimodal Analysis</div>
-                            <p className="text-sm text-zinc-400">When you upload images, Gemini 3.0 Flash <strong className="text-white">actually analyzes</strong> them. This is not a simulation.</p>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="flex gap-4 p-4 bg-zinc-800/50 rounded-xl">
-                                <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400"><Eye size={24} /></div>
-                                <div><h3 className="font-semibold text-white">1. Property Vision</h3><p className="text-sm text-zinc-400 mt-1"><strong className="text-purple-400">Gemini 3.0 Flash (Multimodal)</strong> — Analyzes property images for defects, condition score, and renovation needs.</p></div>
+
+            {
+                showExplainer && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+                        <div className="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-auto p-6 space-y-6">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl font-bold">How It Works</h2>
+                                <button onClick={() => setShowExplainer(false)} className="text-zinc-400 hover:text-white"><X size={24} /></button>
                             </div>
-                            <div className="flex gap-4 p-4 bg-zinc-800/50 rounded-xl">
-                                <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400"><FileSearch size={24} /></div>
-                                <div><h3 className="font-semibold text-white">2. Underwriter</h3><p className="text-sm text-zinc-400 mt-1"><strong className="text-blue-400">Gemini 3.0 Pro + Files API</strong> — Loads Fannie Mae regulations into 1M context window. Issues decision with regulation citations.</p></div>
+                            <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
+                                <div className="flex items-center gap-2 text-green-400 font-semibold mb-2"><Zap size={16} /> Real Multimodal Analysis</div>
+                                <p className="text-sm text-zinc-400">When you upload images, Gemini 3.0 Flash <strong className="text-white">actually analyzes</strong> them. This is not a simulation.</p>
                             </div>
-                            <div className="flex gap-4 p-4 bg-zinc-800/50 rounded-xl">
-                                <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400"><Brain size={24} /></div>
-                                <div><h3 className="font-semibold text-white">3. QA Agent</h3><p className="text-sm text-zinc-400 mt-1"><strong className="text-green-400">Gemini 3.0 Pro</strong> — Audits the decision. Self-correction loop catches hallucinations.</p></div>
+                            <div className="space-y-4">
+                                <div className="flex gap-4 p-4 bg-zinc-800/50 rounded-xl">
+                                    <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400"><Eye size={24} /></div>
+                                    <div><h3 className="font-semibold text-white">1. Property Vision</h3><p className="text-sm text-zinc-400 mt-1"><strong className="text-purple-400">Gemini 3.0 Flash (Multimodal)</strong> — Analyzes property images for defects, condition score, and renovation needs.</p></div>
+                                </div>
+                                <div className="flex gap-4 p-4 bg-zinc-800/50 rounded-xl">
+                                    <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400"><FileSearch size={24} /></div>
+                                    <div><h3 className="font-semibold text-white">2. Underwriter</h3><p className="text-sm text-zinc-400 mt-1"><strong className="text-blue-400">Gemini 3.0 Pro + Files API</strong> — Loads Fannie Mae regulations into 1M context window. Issues decision with regulation citations.</p></div>
+                                </div>
+                                <div className="flex gap-4 p-4 bg-zinc-800/50 rounded-xl">
+                                    <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400"><Brain size={24} /></div>
+                                    <div><h3 className="font-semibold text-white">3. QA Agent</h3><p className="text-sm text-zinc-400 mt-1"><strong className="text-green-400">Gemini 3.0 Pro</strong> — Audits the decision. Self-correction loop catches hallucinations.</p></div>
+                                </div>
                             </div>
+                            <button onClick={() => setShowExplainer(false)} className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl">Got It</button>
                         </div>
-                        <button onClick={() => setShowExplainer(false)} className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl">Got It</button>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* ACCESS CODE MODAL */}
-            {showAccessModal && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[60] p-6">
-                    <div className="bg-zinc-900 border border-purple-500/30 rounded-2xl max-w-md w-full p-8 space-y-6 shadow-2xl shadow-purple-900/20 relative overflow-hidden">
-                        {/* Decorative glow */}
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500" />
+            {
+                showAccessModal && (
+                    <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[60] p-6">
+                        <div className="bg-zinc-900 border border-purple-500/30 rounded-2xl max-w-md w-full p-8 space-y-6 shadow-2xl shadow-purple-900/20 relative overflow-hidden">
+                            {/* Decorative glow */}
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500" />
 
-                        <div className="text-center space-y-2">
-                            <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto text-purple-400 mb-2">
-                                <ShieldCheck size={32} />
-                            </div>
-                            <h2 className="text-2xl font-bold">Judge Access Required</h2>
-                            <p className="text-zinc-400 text-sm">To prevent API abuse during the public hackathon, this demo is gated.</p>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Enter Demo Access Code</label>
-                                <input
-                                    type="text"
-                                    value={tempCode}
-                                    onChange={e => setTempCode(e.target.value)}
-                                    placeholder="Enter code from Devpost..."
-                                    className="w-full px-4 py-3 bg-zinc-950 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition-colors text-center font-mono text-lg tracking-widest uppercase"
-                                    autoFocus
-                                />
+                            <div className="text-center space-y-2">
+                                <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto text-purple-400 mb-2">
+                                    <ShieldCheck size={32} />
+                                </div>
+                                <h2 className="text-2xl font-bold">Judge Access Required</h2>
+                                <p className="text-zinc-400 text-sm">To prevent API abuse during the public hackathon, this demo is gated.</p>
                             </div>
 
-                            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex gap-3 items-start">
-                                <Info size={16} className="text-blue-400 mt-0.5 shrink-0" />
-                                <p className="text-xs text-blue-200">Judges: You can find the access code in the <strong>"Judge's Notes"</strong> or <strong>"Additional Info"</strong> section of our Devpost submission.</p>
-                            </div>
-                        </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Enter Demo Access Code</label>
+                                    <input
+                                        type="text"
+                                        value={tempCode}
+                                        onChange={e => setTempCode(e.target.value)}
+                                        placeholder="Enter code from Devpost..."
+                                        className="w-full px-4 py-3 bg-zinc-950 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 transition-colors text-center font-mono text-lg tracking-widest uppercase"
+                                        autoFocus
+                                    />
+                                </div>
 
-                        <div className="flex gap-3">
-                            <button onClick={() => setShowAccessModal(false)} className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium rounded-xl transition-colors">Cancel</button>
-                            <button onClick={saveCodeAndContinue} disabled={!tempCode.trim()} className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Access Demo</button>
+                                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex gap-3 items-start">
+                                    <Info size={16} className="text-blue-400 mt-0.5 shrink-0" />
+                                    <p className="text-xs text-blue-200">Judges: You can find the access code in the <strong>"Judge's Notes"</strong> or <strong>"Additional Info"</strong> section of our Devpost submission.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button onClick={() => setShowAccessModal(false)} className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium rounded-xl transition-colors">Cancel</button>
+                                <button onClick={saveCodeAndContinue} disabled={!tempCode.trim()} className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Access Demo</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </DemoShell>
+                )
+            }
+
+            <DemoHelper isVisible={isDemoMode} currentStep={currentStep} onAction={handleDemoAction} />
+            <CitationDrawer
+                isOpen={!!selectedCitation}
+                onClose={() => setSelectedCitation(null)}
+                citation={selectedCitation}
+            />
+
+            {/* Footer - Safe Area */}
+            <footer className="safe-footer mt-16" data-testid="page-footer">
+                <p className="text-sm text-zinc-500">
+                    Built by <a href="https://www.linkedin.com/in/zishanalikhan/" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-purple-400 transition-colors">Zishan Ali Khan</a> — Gemini 3 Hackathon (Jan 2026)
+                </p>
+            </footer>
+        </DemoShell >
     );
 };
+

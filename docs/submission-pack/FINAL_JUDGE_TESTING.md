@@ -3,14 +3,13 @@
 ## 🌐 Option 1: Hosted Demo (Recommended)
 **Fastest way to verify.**
 
-1.  **Open URL**: [https://gemini-frontend-231423721146.us-central1.run.app](https://gemini-frontend-231423721146.us-central1.run.app)
-2.  **Authenticate**: Enter Code (available in Devpost for Judges)
-3.  **Run Happy Path**:
-    *   Select **"Input"** tab.
+1.  **Launch Demo**: [https://gemini-frontend-231423721146.us-central1.run.app/?demo=1](https://gemini-frontend-231423721146.us-central1.run.app/?demo=1)
+2.  **Run Happy Path**:
+    *   Click **"Demo"** tab.
     *   Click **"🏠 Modern Home"**.
-    *   Click **"Start Analysis"**.
+    *   Click **"Start Analysis"**. **(No Code Required)**
     *   *Observe*: Green checks, high Condition Score, Approval.
-4.  **Run Edge Case**:
+3.  **Run Edge Case**:
     *   Click **"Start New Analysis"**.
     *   Select **"🏚️ Needs Work"**.
     *   Click **"Start Analysis"**.
