@@ -34,6 +34,21 @@
                                           └─→ [gemini-qa]
 ```
 
+### Current Prod Configuration (Snapshot 2026-01-20)
+
+| Service | Current Revision | Image Tag | CPU | Memory | Min/Max Instances |
+|---------|-----------------|-----------|-----|--------|-------------------|
+| gemini-frontend | gemini-frontend-00007-qbr | :latest | 1 CPU | 512Mi | 1/20 |
+| gemini-broker | gemini-broker-00007-k7q | :latest | 1 CPU | 512Mi | 1/5 |
+| gemini-vision | (check yaml) | :latest | 1 CPU | 512Mi | 0/5 |
+| gemini-underwriter | (check yaml) | :latest | 1 CPU | 512Mi | 0/5 |
+| gemini-qa | (check yaml) | :latest | 1 CPU | 512Mi | 0/5 |
+
+**Artifact Registry:** `us-central1-docker.pkg.dev/gemini3-mortgage-concierge/gemini-mortgage/`
+
+**Secrets Used:**
+- `DEMO_ACCESS_TOKEN` (broker only) — judge access code validation
+
 ---
 
 ## 2. Staging Strategy
